@@ -146,8 +146,3 @@ $(document).on("DOMContentLoaded", function(event) {
 		spa.router($(this).attr('href'));
 	});
 });
-
-
-
-
-
