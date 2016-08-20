@@ -43,6 +43,13 @@
 			template: 'User match!'
 		})
 
+		spa.routeAdd({
+			ulr: '.+',
+			template: function (page) {
+				spa.cache.$main.load(window.location.pathname);
+			}
+		})
+
 	</script>
 </head>
 <body>

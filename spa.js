@@ -86,19 +86,21 @@
 		window.history.pushState({ url: url }, page.title, '/'+url);
         // window.dispatchEvent(new Event('popstate'));
 
-		spa.page.load(page, callback);
+        if(page.action){
+        	page.template(page);
+        }else{
+			spa.page.loadTemplate(page, callback);
+        }
 	};
 
 	spa.page = {
-		load: function(page, callback){
-			spa.cache.$main.hide();
+		loadTemplate: function(page, callback){
 			spa.cache.$main.html(
 				Mustache.render(page.template, page.context)
 			)
 
 			document.title = page.title || document.title;
 			callback(page);
-			spa.cache.$main.show();
 		}
 	};
 
@@ -141,17 +143,10 @@ $(document).on("DOMContentLoaded", function(event) {
 	*/
 	spa.cache.$body.on('click', '.ajax-link', function(event){
 		event.preventDefault();
-		spa.router($(this).attr('href'))
+		spa.router($(this).attr('href'));
 	});
 });
 
-/*
-	listen 
-*/
-// $(window).on( "popstate", function(event) {
-// 	var url = history.state ? history.state.url : spa.startPath;
-// 	spa.router(url);
-// });
 
 
 
