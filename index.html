@@ -1,0 +1,57 @@
+<html>
+<head>
+	<title>My SPA</title>
+
+	<script 
+		src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.js"
+	></script>
+
+	<script 
+		src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.2.1/mustache.js"
+	></script>
+
+	<script src="/xregexp-all.js"></script>
+
+	<script src="/spa.js"></script>
+
+	<script type="text/javascript">
+		spa.content.template = spa.templatePath('/template.html')
+
+		spa.routeAdd({
+			url: '^$',
+			title: 'home',
+			template: spa.templatePath('/home.html'),
+			context: {}
+		});
+
+		spa.routeAdd({
+			url: '^about$',
+			title: 'About',
+			template: spa.templatePath('/about.html'),
+			context: {}
+		});
+
+		spa.routeAdd({
+			url: '^[0-9]+$',
+			title: 'Number',
+			template: 'Number match!',
+		});
+
+		spa.routeAdd({
+			url: '^(?<name>[a-z]+)/(?<id> [0-9]+)',
+			title: 'User Info',
+			template: 'User match!'
+		})
+
+	</script>
+</head>
+<body>
+	<div id="spa-loader-holder">
+		<center>
+			<h1>Loading...</h1>
+		</center>
+	</div>
+	<div id="spa-content" style="display:none;">
+	</div>
+</body>
+</html>
