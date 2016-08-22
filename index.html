@@ -17,6 +17,10 @@
 	<script type="text/javascript">
 		spa.content.template = spa.templatePath('/template.html')
 
+		/*
+			routes
+		*/
+
 		spa.routeAdd({
 			url: '^$',
 			title: 'home',
@@ -41,22 +45,27 @@
 			url: '^(?<name>[a-z]+)/(?<id> [0-9]+)',
 			title: 'User Info',
 			template: spa.templatePath('/user.html'),
-			action: function(page){
-				page.renderTemplate(page.res);
+			action: function(){
+				this.context = this.res;
+				this.renderTemplate();
 			}
 		});
 
-		spa.routeAdd({
-			ulr: '.+',
-			action: function (page, callback) {
-				spa.cache.$main.load(window.location.pathname);
-			}
-		});
+		//catch all route
+		// spa.routeAdd({
+		// 	ulr: '^server/(?<fileName>.+)',
+		// 	action: function (page, callback) {
+		// 		spa.cache.$main.load(window.location.pathname);
+		// 	}
+		// });
+
+		/*
+			components
+		*/
 
 		spa.addComponent({
 			name: 'clock',
 			template: '<div id="spa-clock-text">The Time Is:</div><div id="spa-clock-time">{{hour}}:{{minute}}:{{second}}</div>',
-			
 			init: function(){
 				this.setInterval.refresh = window.setInterval(function(component){
 					var time = new Date();
@@ -67,6 +76,19 @@
 						second: time.getSeconds()
 					});
 				}, 500, this);
+			}
+		});
+
+		spa.addComponent({
+			name: 'reddit',
+			template: spa.templatePath('/reddit.html'),
+			init: function(){
+				var component = this;
+				$.get('https://www.reddit.com/.json', function (data) {
+					component.renderTemplate({
+						posts: data.data.children
+					});
+			    });
 			}
 		});
 

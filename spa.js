@@ -1,6 +1,8 @@
 'use strict';
 
 (function($){
+	var callback = callback || function(){};
+
 	/*
 		set up dependences
 	*/
@@ -34,8 +36,13 @@
 	*/
 	spa.errorPages = {
 		'404': {
-			template: "<center><h1><i>Page Not Found</i></h1><center>",
-			title: "404"
+			template: '<center><h1><i>Page Not Found</i></h1>{{message}}<center>',
+			title: '404'
+		},
+		'500': {
+			title: '500',
+			template: '<center><h1><i>SPA error</i></h1>{{message}}<center>'
+			
 		}
 	};
 
@@ -59,42 +66,56 @@
 	*/
 	spa.router = function(url, callback){
 
+		// hold an empty page object
 		var page = {};
-		url = url.replace(/^\//, '');
+		// remove preceding slashes
+		url = url.replace(/^\/+/, '');
 		callback = callback || function(){};
 
-
+		// loop over all the routes and find a match
 		if(!spa.routes.some(function(route){
 			var re = XRegExp.exec(url, XRegExp(route.url, 'ix'));
 			if(re){
 				page = route;
 				page.res = re;
+
+				// when a match is found
 				return true;
 			}
 		})){
+
+			// pull up the error page when a matching route isnt found
 			page = spa.errorPages['404'];
+			page.context = {message: 'No route found.'}
 		}
 
+		// prevented double load
 		if(spa.current.page && spa.current.page.url === page.url){
-			console.log('prevented double load.')
 			return false;
 		}else{
 			spa.current.page = page;
 		}
 
-
+		// set the history events
 		window.history.pushState({ url: url }, page.title, '/'+url);
         // window.dispatchEvent(new Event('popstate'));
 
+        //load the route // this should be moved else where
         if($.isFunction(page.action)){
         	page.action(page, callback);
-        }else{
+        }else if(page.template){
 			spa.page.renderTemplate(page, callback);
+        }else{
+        	spa.page.renderTemplate(spa.errorPages['500'], {message:'No action can be taken.'})
         }
 	};
 
+	/*
+	*/
 	spa.page = {
 		renderTemplate: function(page, callback){
+			callback = callback || function(){};
+			
 			spa.cache.$main.html(
 				Mustache.render(page.template, page.context)
 			);
@@ -121,9 +142,8 @@
 	spa.addComponent = function(component){
 		component.setTimeouts = {};
 		component.setInterval = {};
-		
+
 		component.load = function($element){
-			console.log(arguments);
 			this.$template = $element;
 			this.init();
 		}
@@ -144,6 +164,12 @@
 	*/
 	spa.routeAdd = function(pageOBJ){
 		pageOBJ.template = pageOBJ.template || '';
+
+		pageOBJ.renderTemplate = function(){
+			console.log(this)
+			spa.page.renderTemplate(this)
+		};
+
 		spa.routes.push(pageOBJ);
 	};
 
