@@ -115,20 +115,35 @@
 	spa.page = {
 		renderTemplate: function(page, callback){
 			callback = callback || function(){};
-			
+
 			spa.cache.$main.html(
 				Mustache.render(page.template, page.context)
 			);
+
+			/*
+				find and list components
+				this should be moved and broken up
+			*/
 
 			page.component = (function(){
 				var components = [];
 
 				spa.cache.$main.find('[data-component-name]').each(function(e){
 					var $this = $(this);
-					var component = spa.components[$this.data('component-name')];
+					var componentName = $this.data('component-name');
+					var component = spa.components[componentName];
 					
+					//set error component if none is found
+					if(!component){
+						component = spa.components['_component_404'];
+						component.error = {
+							componentName: componentName
+						};
+					}else{
+						components.push(component);
+					}
+
 					component.load($this);
-					components.push(component);
 				});
 
 				return components;
@@ -166,8 +181,7 @@
 		pageOBJ.template = pageOBJ.template || '';
 
 		pageOBJ.renderTemplate = function(){
-			console.log(this)
-			spa.page.renderTemplate(this)
+			spa.page.renderTemplate(this);
 		};
 
 		spa.routes.push(pageOBJ);

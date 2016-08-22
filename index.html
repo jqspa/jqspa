@@ -71,7 +71,7 @@
 					var time = new Date();
 					
 					component.renderTemplate({
-						hour: time.getHours()%12,
+						hour: time.getHours()%12 || 12,
 						minute: time.getMinutes(),
 						second: time.getSeconds()
 					});
@@ -89,6 +89,15 @@
 						posts: data.data.children
 					});
 			    });
+			}
+		});
+
+		spa.addComponent({
+			name: '_component_404',
+			template: '<b>Component <i>{{componentName}}</i> is not registered<b><br/>{{message}}',
+			init: function(){
+				console.log(this.error);
+				this.renderTemplate(this.error);
 			}
 		});
 
