@@ -18,7 +18,7 @@
 		cache: {},
 		routes: [],
 		current: {},
-		startPath: '/'
+		components: {}
 	};
 
 	/*
@@ -86,28 +86,64 @@
 		window.history.pushState({ url: url }, page.title, '/'+url);
         // window.dispatchEvent(new Event('popstate'));
 
-        if(page.action){
-        	page.template(page);
+        if($.isFunction(page.action)){
+        	page.action(page, callback);
         }else{
-			spa.page.loadTemplate(page, callback);
+			spa.page.renderTemplate(page, callback);
         }
 	};
 
 	spa.page = {
-		loadTemplate: function(page, callback){
+		renderTemplate: function(page, callback){
 			spa.cache.$main.html(
 				Mustache.render(page.template, page.context)
-			)
+			);
+
+			page.component = (function(){
+				var components = [];
+
+				spa.cache.$main.find('[data-component-name]').each(function(e){
+					var $this = $(this);
+					var component = spa.components[$this.data('component-name')];
+					
+					component.load($this);
+					components.push(component);
+				});
+
+				return components;
+			})()
 
 			document.title = page.title || document.title;
 			callback(page);
 		}
 	};
 
+	spa.addComponent = function(component){
+		component.setTimeouts = {};
+		component.setInterval = {};
+		
+		component.load = function($element){
+			console.log(arguments);
+			this.$template = $element;
+			this.init();
+		}
+
+		component.renderTemplate = function(context){
+			this.$template.html(Mustache.render(
+				this.template,
+				$.extend({}, this.context, context)
+			));
+		};
+
+		spa.components[component.name] = component;
+	};
+
+
 	/*
 		add route to the routes list
 	*/
 	spa.routeAdd = function(pageOBJ){
+		pageOBJ.template = pageOBJ.template || '';
 		spa.routes.push(pageOBJ);
 	};
 

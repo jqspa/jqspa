@@ -40,15 +40,35 @@
 		spa.routeAdd({
 			url: '^(?<name>[a-z]+)/(?<id> [0-9]+)',
 			title: 'User Info',
-			template: 'User match!'
-		})
+			template: spa.templatePath('/user.html'),
+			action: function(page){
+				page.renderTemplate(page.res);
+			}
+		});
 
 		spa.routeAdd({
 			ulr: '.+',
-			template: function (page) {
+			action: function (page, callback) {
 				spa.cache.$main.load(window.location.pathname);
 			}
-		})
+		});
+
+		spa.addComponent({
+			name: 'clock',
+			template: '<div id="spa-clock-text">The Time Is:</div><div id="spa-clock-time">{{hour}}:{{minute}}:{{second}}</div>',
+			
+			init: function(){
+				this.setInterval.refresh = window.setInterval(function(component){
+					var time = new Date();
+					
+					component.renderTemplate({
+						hour: time.getHours()%12,
+						minute: time.getMinutes(),
+						second: time.getSeconds()
+					});
+				}, 500, this);
+			}
+		});
 
 	</script>
 </head>
