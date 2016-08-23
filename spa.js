@@ -173,6 +173,8 @@
 			match.load(spa.current.shell.$container.find('#spa-shell-page'));
 			spa.current.page = match;
 
+			spa.Router.history({url: url}, match.title, url)
+
 		};
 
 		return page;
@@ -247,9 +249,8 @@
 			return match;
 		},
 
-		historyAdd: function(){
-			// set the history events
-			//window.history.pushState({ url: url }, page.title, '/'+url);
+		historyAdd: function(state, title, url){
+			window.history.pushState({ url: url }, page.title, '/'+url);
 		    // window.dispatchEvent(new Event('popstate'));
 
 		}
