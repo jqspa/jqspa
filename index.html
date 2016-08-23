@@ -15,46 +15,50 @@
 	<script src="/spa.js"></script>
 
 	<script type="text/javascript">
-		spa.content.template = spa.templatePath('/template.html')
+
+		spa.Shell.add({
+			name: 'index',
+			template: spa.templatePath('/template.html')
+		})
 
 		/*
 			routes
 		*/
 
-		spa.routeAdd({
-			url: '^$',
+		spa.Page.add({
+			uri: '^$',
 			title: 'home',
 			template: spa.templatePath('/home.html'),
 			context: {}
 		});
 
-		spa.routeAdd({
-			url: '^about$',
+		spa.Page.add({
+			uri: '^about$',
 			title: 'About',
 			template: spa.templatePath('/about.html'),
 			context: {}
 		});
 
-		spa.routeAdd({
-			url: '^[0-9]+$',
+		spa.Page.add({
+			uri: '^[0-9]+$',
 			title: 'Number',
 			template: 'Number match!',
 		});
 
-		spa.routeAdd({
-			url: '^(?<name>[a-z]+)/(?<id> [0-9]+)',
+		spa.Page.add({
+			uri: '^(?<name>[a-z]+)/(?<id> [0-9]+)',
 			title: 'User Info',
 			template: spa.templatePath('/user.html'),
-			action: function(){
-				this.context = this.res;
-				this.renderTemplate();
+			init: function(){
+				// this.context = this.res;
+				this.renderTemplate(this.REQ.re);
 			}
 		});
 
 		//catch all route
-		// spa.routeAdd({
-		// 	ulr: '^server/(?<fileName>.+)',
-		// 	action: function (page, callback) {
+		// spa.Page.add({
+		// 	uri: '^server/(?<fileName>.+)',
+		// 	init: function (page, callback) {
 		// 		spa.cache.$main.load(window.location.pathname);
 		// 	}
 		// });
@@ -63,7 +67,7 @@
 			components
 		*/
 
-		spa.addComponent({
+		spa.Component.add({
 			name: 'clock',
 			template: '<div id="spa-clock-text">The Time Is:</div><div id="spa-clock-time">{{hour}}:{{minute}}:{{second}}</div>',
 			init: function(){
@@ -79,7 +83,7 @@
 			}
 		});
 
-		spa.addComponent({
+		spa.Component.add({
 			name: 'reddit',
 			template: spa.templatePath('/reddit.html'),
 			init: function(){
@@ -92,15 +96,6 @@
 			}
 		});
 
-		spa.addComponent({
-			name: '_component_404',
-			template: '<b>Component <i>{{componentName}}</i> is not registered<b><br/>{{message}}',
-			init: function(){
-				console.log(this.error);
-				this.renderTemplate(this.error);
-			}
-		});
-
 	</script>
 </head>
 <body>
@@ -109,7 +104,7 @@
 			<h1>Loading...</h1>
 		</center>
 	</div>
-	<div id="spa-content" style="display:none;">
+	<div id="spa-shell" style="display:none;">
 	</div>
 </body>
 </html>

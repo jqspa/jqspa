@@ -1,7 +1,7 @@
 'use strict';
 
+	function callback(){};
 (function($){
-	var callback = callback || function(){};
 
 	/*
 		set up dependences
@@ -20,29 +20,9 @@
 		cache: {},
 		routes: [],
 		current: {},
-		components: {}
-	};
-
-	/*
-		hold default page template
-	*/
-	spa.content = {
-		template: '<main></main>',
-		context: {}
-	};
-
-	/*
-		set page objects for errors
-	*/
-	spa.errorPages = {
-		'404': {
-			template: '<center><h1><i>Page Not Found</i></h1>{{message}}<center>',
-			title: '404'
-		},
-		'500': {
-			title: '500',
-			template: '<center><h1><i>SPA error</i></h1>{{message}}<center>'
-			
+		components: {},
+		defualts: {
+			shell: 'index'
 		}
 	};
 
@@ -50,144 +30,234 @@
 		grab templates from the server
 	*/
 	spa.templatePath = function(path){
-		var template = '';
+		var string = '';
 		jQuery.ajax({
 	        url: path,
 	        success: function(data){
-	        	template = data
+	        	string = data
 	        },
 	        async: false
     	});
-    	return template;
+    	return string;
 	};
-
 	/*
-		parse route
+		base object for renderables
 	*/
-	spa.router = function(url, callback){
+	spa.__Template = {
+		context: {},
+		template: '',
+		setTimeouts: {},
+		setInterval: {},
 
-		// hold an empty page object
-		var page = {};
-		// remove preceding slashes
-		url = url.replace(/^\/+/, '');
-		callback = callback || function(){};
+		init: function(){
+			this.renderTemplate();
+		},
 
-		// loop over all the routes and find a match
-		if(!spa.routes.some(function(route){
-			var re = XRegExp.exec(url, XRegExp(route.url, 'ix'));
-			if(re){
-				page = route;
-				page.res = re;
-
-				// when a match is found
-				return true;
-			}
-		})){
-
-			// pull up the error page when a matching route isnt found
-			page = spa.errorPages['404'];
-			page.context = {message: 'No route found.'}
-		}
-
-		// prevented double load
-		if(spa.current.page && spa.current.page.url === page.url){
-			return false;
-		}else{
-			spa.current.page = page;
-		}
-
-		// set the history events
-		window.history.pushState({ url: url }, page.title, '/'+url);
-        // window.dispatchEvent(new Event('popstate'));
-
-        //load the route // this should be moved else where
-        if($.isFunction(page.action)){
-        	page.action(page, callback);
-        }else if(page.template){
-			spa.page.renderTemplate(page, callback);
-        }else{
-        	spa.page.renderTemplate(spa.errorPages['500'], {message:'No action can be taken.'})
-        }
-	};
-
-	/*
-	*/
-	spa.page = {
-		renderTemplate: function(page, callback){
-			callback = callback || function(){};
-
-			spa.cache.$main.html(
-				Mustache.render(page.template, page.context)
-			);
-
-			/*
-				find and list components
-				this should be moved and broken up
-			*/
-
-			page.component = (function(){
-				var components = [];
-
-				spa.cache.$main.find('[data-component-name]').each(function(e){
-					var $this = $(this);
-					var componentName = $this.data('component-name');
-					var component = spa.components[componentName];
-					
-					//set error component if none is found
-					if(!component){
-						component = spa.components['_component_404'];
-						component.error = {
-							componentName: componentName
-						};
-					}else{
-						components.push(component);
-					}
-
-					component.load($this);
-				});
-
-				return components;
-			})()
-
-			document.title = page.title || document.title;
-			callback(page);
-		}
-	};
-
-	spa.addComponent = function(component){
-		component.setTimeouts = {};
-		component.setInterval = {};
-
-		component.load = function($element){
-			this.$template = $element;
+		load: function($element){
+			this.$container = $element;
 			this.init();
-		}
-
-		component.renderTemplate = function(context){
-			this.$template.html(Mustache.render(
+		},
+		renderTemplate: function(context){
+			console.log('context', context)
+			this.$container.html( Mustache.render(
 				this.template,
 				$.extend({}, this.context, context)
-			));
+			) );
+			this.components = spa.Component.$find(this.$container);
+		},
+		declare: function(object){
+			var newObject = Object.create(spa.__Template);
+			newObject = Object.create(this);
+
+			return $.extend(newObject, {declare:null}, object);
+		},
+		clearSets: function(){
+			for(var key in this.setInterval){
+				clearInterval( this.setInterval[key] );
+			}
+
+			for(var key in this.setTimeouts){
+				clearTimeout( this.setTimeouts[key] );
+			}
+		},
+		unload: function(){
+			this.clearSets();
+		},
+		errorTemplates: {}
+	};
+
+	/* 
+		error templates
+	*/
+	spa.__Template.errorTemplates['404'] = spa.__Template.declare({
+		template: '<center><h1><i>Page {{name}} Not Found</i></h1>{{message}}<center>',
+		title: '404'
+	});
+
+	spa.__Template.errorTemplates['500'] = spa.__Template.declare({
+		title: '500',
+		template: '<center><h1><i>SPA error {{name}}</i></h1>{{message}}<center>'
+	});
+
+	/*
+		Shells
+	*/
+	spa.shells = {};
+	spa.Shell = (function(){
+		var shell = Object.create(spa.__Template);
+
+		shell.defualtContainerSelector = '#spa-shell';
+
+		shell.add = function(shell){
+			if(!shell.name) return false;
+
+			shell = this.declare(shell);
+			spa.shells[shell.name] = shell;
+		};
+		shell.renderTemplate = function(context, callback){
+			spa.__Template.renderTemplate.call(this, context);
 		};
 
-		spa.components[component.name] = component;
-	};
+		shell.update = function(shell){
+			shell = shell || spa.shells[ spa.defualts.shell ];
+			if(spa.current.shell === shell) return false;
+
+			spa.current.shell = shell;
+			shell.load(this.$container);
+		};
+
+		$(document).on("DOMContentLoaded", function(event) {
+			spa.Shell.$container = $(this.defualtContainerSelector);
+		});
+
+		return shell
+	})(); 
 
 
 	/*
-		add route to the routes list
+		Pages
 	*/
-	spa.routeAdd = function(pageOBJ){
-		pageOBJ.template = pageOBJ.template || '';
+	spa.pages = [];
+	spa.Page = (function(){
+		var page = Object.create(spa.__Template);
 
-		pageOBJ.renderTemplate = function(){
-			spa.page.renderTemplate(this);
+		page.add = function(page){
+			if(!page.uri) return false;
+
+			page = this.declare(page);
+			spa.pages.push(page);
 		};
 
-		spa.routes.push(pageOBJ);
-	};
+		page.renderTemplate = function(context, callback){
+			spa.__Template.renderTemplate.call(this, context);
+			document.title = this.title || document.title;
+		};
 
+		page.resolver = function(url){
+			var match = spa.Router.lookup(url, spa.pages);
+
+			if(match === spa.current.page) return false;
+			if(!match){
+				match = this.errorTemplates['404'];
+
+				match.context = {
+					name: url
+				};
+			}
+			if(spa.current.page){
+				spa.current.page.unload();
+			}
+
+			spa.Shell.update(match.shell);
+
+			match.load(spa.current.shell.$container.find('#spa-shell-page'));
+			spa.current.page = match;
+
+		};
+
+		return page;
+	})();
+
+
+	/*
+		Components
+	*/
+	spa.components = {};
+	spa.Component = (function(){
+		var component = Object.create(spa.__Template);
+
+		component.add =function(component){
+			if(!component.name) return false;
+
+			component = this.declare(component);
+			spa.components[component.name] = component;
+		};
+
+		component.$find = function($element){
+			var components = [];
+
+			$element.find('[data-component-name]').each(function(element){
+				var $this = $(this);
+				var componentName = $this.data('component-name');
+				var component = spa.components[componentName];
+				
+				//set error component if none is found
+				if(!component){
+					component = spa.Component.errorTemplates['404'];
+					component.context = {
+						name: componentName
+					};
+				}else{
+					components.push(component);
+				}
+
+				component.load($this);
+			});
+
+			return components;
+		}
+
+		return component;
+	})();
+
+	/*
+		router
+	*/
+	spa.routes = [];
+	spa.Router = {
+		defaultRoute: spa.pages,
+
+		lookup: function(url, routes){
+			var match = false;
+			url = url.replace(/^\/+/, '');
+			routes = routes || this.defaultRoute;
+
+			if(!routes.some(function(route){
+				var re = XRegExp.exec(url, XRegExp(route.uri, 'ix'));
+				if(re){
+					route.REQ = {
+						url: url,
+						re: re
+					}
+					match = route;
+					return true;
+				}
+			}));
+
+			return match;
+		},
+
+		historyAdd: function(){
+			// set the history events
+			//window.history.pushState({ url: url }, page.title, '/'+url);
+		    // window.dispatchEvent(new Event('popstate'));
+
+		}
+
+	};
 })(jQuery);
+
+
 
 /*
 	when the DOM is finished, start the spa
@@ -195,30 +265,22 @@
 $(document).on("DOMContentLoaded", function(event) {
 	/* cache stuff */
 	spa.cache.$loader = $('#spa-loader-holder');
-	spa.cache.$content = $('#spa-content');
 	spa.cache.$body = $('body');
 
-	/* load stuff */
-	spa.cache.$content.html(
-		Mustache.render(spa.content.template, spa.content.context)
-	);
-
-	/* more cache */
-	spa.cache.$main = $('main');
 
 	/* 
 		load the first route 
 	*/
-	spa.router(window.location.pathname, function(page){
-		spa.cache.$loader.hide();
-		spa.cache.$content.show();
-	});
+	spa.Shell.$container = $(spa.Shell.defualtContainerSelector);
+	spa.Page.resolver(window.location.pathname);
+	// 	function(page){
+	// });
+	spa.cache.$loader.hide();
+	spa.Shell.$container.show();
 
-	/*
-		catch ajax load links
-	*/
 	spa.cache.$body.on('click', '.ajax-link', function(event){
 		event.preventDefault();
-		spa.router($(this).attr('href'));
+		spa.Page.resolver($(this).attr('href'));
+		return false;
 	});
 });
