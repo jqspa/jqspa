@@ -48,14 +48,16 @@
 		template: '',
 		setTimeouts: {},
 		setInterval: {},
+		errorTemplates: {},
+		$container: null,
+
+		__setUp: function($element){
+			this.$container = $element;
+			this.init();
+		},
 
 		init: function(){
 			this.renderTemplate();
-		},
-
-		load: function($element){
-			this.$container = $element;
-			this.init();
 		},
 		renderTemplate: function(context){
 			console.log('context', context)
@@ -65,13 +67,12 @@
 			) );
 			this.components = spa.Component.$find(this.$container);
 		},
-		declare: function(object){
-			var newObject = Object.create(spa.__Template);
-			newObject = Object.create(this);
+		__declare: function(object){
+			var newObject = Object.create(this);
 
-			return $.extend(newObject, {declare:null}, object);
+			return $.extend(newObject, {__declare:null}, object);
 		},
-		clearSets: function(){
+		__clearSets: function(){
 			for(var key in this.setInterval){
 				clearInterval( this.setInterval[key] );
 			}
@@ -83,18 +84,17 @@
 		unload: function(){
 			this.clearSets();
 		},
-		errorTemplates: {}
 	};
 
 	/* 
 		error templates
 	*/
-	spa.__Template.errorTemplates['404'] = spa.__Template.declare({
+	spa.__Template.errorTemplates['404'] = spa.__Template.__declare({
 		template: '<center><h1><i>Page {{name}} Not Found</i></h1>{{message}}<center>',
 		title: '404'
 	});
 
-	spa.__Template.errorTemplates['500'] = spa.__Template.declare({
+	spa.__Template.errorTemplates['500'] = spa.__Template.__declare({
 		title: '500',
 		template: '<center><h1><i>SPA error {{name}}</i></h1>{{message}}<center>'
 	});
@@ -111,7 +111,7 @@
 		shell.add = function(shell){
 			if(!shell.name) return false;
 
-			shell = this.declare(shell);
+			shell = this.__declare(shell);
 			spa.shells[shell.name] = shell;
 		};
 		shell.renderTemplate = function(context, callback){
@@ -123,7 +123,7 @@
 			if(spa.current.shell === shell) return false;
 
 			spa.current.shell = shell;
-			shell.load(this.$container);
+			shell.__setUp(this.$container);
 		};
 
 		$(document).on("DOMContentLoaded", function(event) {
@@ -144,7 +144,7 @@
 		page.add = function(page){
 			if(!page.uri) return false;
 
-			page = this.declare(page);
+			page = this.__declare(page);
 			spa.pages.push(page);
 		};
 
@@ -170,12 +170,13 @@
 
 			spa.Shell.update(match.shell);
 
-			match.load(spa.current.shell.$container.find('#spa-shell-page'));
+			match.__setUp(spa.current.shell.$container.find('#spa-shell-page'));
 			spa.current.page = match;
 
-			spa.Router.history({url: url}, match.title, url)
+			spa.Router.historyAdd({url: url}, match.title, url);
 
 		};
+
 
 		return page;
 	})();
@@ -191,11 +192,11 @@
 		component.add =function(component){
 			if(!component.name) return false;
 
-			component = this.declare(component);
+			component = this.__declare(component);
 			spa.components[component.name] = component;
 		};
 
-		component.$find = function($element){
+		component.$find = function($element, dontStart){
 			var components = [];
 
 			$element.find('[data-component-name]').each(function(element){
@@ -213,7 +214,7 @@
 					components.push(component);
 				}
 
-				component.load($this);
+				component.__setUp($this);
 			});
 
 			return components;
@@ -250,14 +251,13 @@
 		},
 
 		historyAdd: function(state, title, url){
-			window.history.pushState({ url: url }, page.title, '/'+url);
+			window.history.pushState(state, title, url);
 		    // window.dispatchEvent(new Event('popstate'));
 
 		}
 
 	};
 })(jQuery);
-
 
 
 /*
@@ -267,15 +267,16 @@ $(document).on("DOMContentLoaded", function(event) {
 	/* cache stuff */
 	spa.cache.$loader = $('#spa-loader-holder');
 	spa.cache.$body = $('body');
+	spa.Shell.$container = $(spa.Shell.defualtContainerSelector);
 
-
+	$( window ).on( "popstate", function( event ) {
+		spa.Page.resolver(window.history.state.url);
+	} );
 	/* 
 		load the first route 
 	*/
-	spa.Shell.$container = $(spa.Shell.defualtContainerSelector);
 	spa.Page.resolver(window.location.pathname);
-	// 	function(page){
-	// });
+
 	spa.cache.$loader.hide();
 	spa.Shell.$container.show();
 
