@@ -16,7 +16,7 @@
 		set up spa object
 	*/
 	window.spa = {
-		cache: {},
+		$cache: {},
 		routes: [],
 		current: {},
 		components: {},
@@ -110,6 +110,7 @@
 			if(!shell.name) return false;
 
 			shell = this.__declare(shell);
+
 			spa.shells[shell.name] = shell;
 		};
 		shell.renderTemplate = function(context, callback){
@@ -265,9 +266,9 @@
 	when the DOM is finished, start the spa
 */
 $(document).on("DOMContentLoaded", function(event) {
-	/* cache stuff */
-	spa.cache.$loader = $('#spa-loader-holder');
-	spa.cache.$body = $('body');
+	/* $cache stuff */
+	spa.$cache.$loader = $('#spa-loader-holder');
+	spa.$cache.$body = $('body');
 	spa.Shell.$container = $(spa.Shell.defualtContainerSelector);
 
 	$( window ).on( "popstate", function( event ) {
@@ -278,10 +279,10 @@ $(document).on("DOMContentLoaded", function(event) {
 	*/
 	spa.Page.resolver(window.location.pathname, false);
 
-	spa.cache.$loader.hide();
+	spa.$cache.$loader.hide();
 	spa.Shell.$container.show();
 
-	spa.cache.$body.on('click', '.ajax-link', function(event){
+	spa.$cache.$body.on('click', '.ajax-link', function(event){
 		event.preventDefault();
 		spa.Page.resolver( $(this).attr('href') );
 		return false;

@@ -32,16 +32,16 @@ is global namespace object that will hold everything.
   * `__setUp( $element )`
     * `$element` *jQuery object*
       * the renderables container
-    Sets up the internal state. Then calls the init.
-    *This is a internal method not meant to be called outside of the spa object.**
+    * Sets up the internal state. Then calls the init.
+    * **This is a internal method not meant to be called outside of the spa object.**
  
   * `init()`
-    Hold the starting logic. This must call `this.renderTemplate`. Default action is reading the template.
+    * Hold the starting logic. This must call `this.renderTemplate`. Default action is reading the template.
  
   * `renderTemplate( [context] )`
     * `context` *Object* 
       * render context
-    renders the template to the objects container. **context** passed will extend `this`.context and be passed to the render.
+    * Renders the template to the objects container. **context** passed will extend `this`.context and be passed to the render.
 
   * `__delcare( context )`
     * `context` *object* new instance context
