@@ -21,7 +21,7 @@ This object holds the methods that load, render and manager interaction with the
 `$container` *jQuery object* Reference to the parent container. This is where the object renders its template to.
 
 ### `__setUp( $element )`
-  `$element` *jQuery object* of the renderables container
+`$element` *jQuery object* of the renderables container
 Sets up the internal state. Then calls the init.
 **This is a internal method not meant to be called outside of the spa object.**
 
