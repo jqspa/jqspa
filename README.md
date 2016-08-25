@@ -10,7 +10,7 @@ is global namespace object that will hold everything.
 `errorPages` *object* holding renderable error templates for when things fail
  
 
-* `spa.__Renderable`
+* ## `spa.__Renderable`
   * This object holds the methods that load, render and manager interaction with the DOM. It is not meant to be used directly but is a base object for other object.
  
   * `context`
@@ -38,11 +38,11 @@ is global namespace object that will hold everything.
     * Hold the starting logic. This must call `this.renderTemplate`. Default action is reading the template.
  
   * `renderTemplate( [context] )`
-    * **context** *Object* render context
+    * `context` *Object* render context
     * renders the template to the objects container. **context** passed will extend `this`.context and be passed to the render.
 
   * `__delcare( context )`
-    * **context** *object* new instance context
+    * `context` *object* new instance context
     * **returns** new instance of `this` object with the passed **context**.
 
   * `__clearSets()`
@@ -52,42 +52,40 @@ is global namespace object that will hold everything.
     * Clean up object, calls `this.clearSets`
 
 
-* ## shell
+* ## `Shell` 
   * The shell is the outer most layer of the Document wrapper. At least one shell must be declared, the `index` shell. The shell implements all `__Renderable` with some new ones and changes
 
   * `add( shell )`
     * `shell` object
       * object defining the shell to be added
-    * Takes shell objects and registers them with the spa.
+    * Takes the *shell*, creates an instance for it and registers that with the spa.
 
   * `update( shell )`
-    * 'shell'
+    * `shell`
    		* *spa.shell element*
       * reference to new shell
-    * Updates the shell with a new shell if the new shell is different then the current one
+    * Updates the  current shell with a new **shell** if the new shell is different then the current one.
 
 
-## page
+* ## `Page`
 Pages hold main content, and are routable by default. The page implements all `__Renderable` with some new ones and changes
 
-`add` Function
-Arguments
-	`page` object
-	object defining the page to be added
-takes page objects and registers them with the spa.
+  * `add( page )`
+	* `page` object
+	* object defining the page to be added.
+    * takes page objects and registers them with the spa.
 
-`renderTemplate`
-Calls `__Tamplate.renderTemplate` and sets the pages title
+  * `renderTemplate( context )`
+    * Calls `__Tamplate.renderTemplate` and sets the pages title
 
 
-## components
+* ## components
 Components are spinets of functionality, think like Java applets or active X components. This where you should place all interactive elements of your application. The component implements all `__Renderable` with some new ones and changes
 
-`add` Function
-Arguments
-	`component` object
-	object defining the component to be added
-takes component objects and registers them with the spa.
+  * `add( component )`
+	* `component` object
+	  * object defining the component to be added
+    * takes component objects and registers them with the spa.
 
 
 `$find`
