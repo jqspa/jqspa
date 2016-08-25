@@ -39,34 +39,32 @@ is global namespace object that will hold everything.
  
   * `renderTemplate( [context] )`
     * **context** *Object* render context
-    * renders the template to the objects container. context passed will extend this.context.
+    * renders the template to the objects container. **context** passed will extend `this`.context and be passed to the render.
 
-### `__delcare( object )`
-**object** *object* new instance context
-Internal method to aid in instance creation.
-returns new instance.
+  * `__delcare( context )`
+    * **context** *object* new instance context
+    * **returns** new instance of `this` object with the passed **context**.
 
-`__clearSets` Function
-Internal method to clear all `setTimeOuts` and `setIntervals`
+  * `__clearSets()`
+    * Internal method to clear all `setTimeOuts` and `setIntervals`
 
-`unload` Function
-Clean up object, calls `this.clearSets`
+  * `unload()`
+    * Clean up object, calls `this.clearSets`
 
 
-## shell
-The shell is the outer most layer of the Document wrapper. At least one shell must be declared, the `index` shell. The shell implements all `__Renderable` with some new ones and changes
+* ## shell
+  * The shell is the outer most layer of the Document wrapper. At least one shell must be declared, the `index` shell. The shell implements all `__Renderable` with some new ones and changes
 
-# shell methods
-`add` Function
-Arguments
-	`shell` object
-	object defining the shell to be added
-takes shell objects and registers them with the spa.
+  * `add( shell )`
+    * `shell` object
+      * object defining the shell to be added
+    * Takes shell objects and registers them with the spa.
 
-`update`
-Arguments
-	'shell' refence to new shell
-Updates the shell with a new shell if the new shell is different then the current one
+  * `update( shell )`
+    * 'shell'
+   		* *spa.shell element*
+      * reference to new shell
+    * Updates the shell with a new shell if the new shell is different then the current one
 
 
 ## page
