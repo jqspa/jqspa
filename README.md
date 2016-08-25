@@ -11,7 +11,7 @@ is global namespace object that will hold everything.
  
 
 * ## `spa.__Renderable`
-  * This object holds the methods that load, render and manager interaction with the DOM. It is not meant to be used directly but is a base object for other object.
+  This object holds the methods that load, render and manager interaction with the DOM. It is not meant to be used directly but is a base object for other object.
  
   * `context`
     * *Object* default `{}`
@@ -27,19 +27,21 @@ is global namespace object that will hold everything.
  
   * `$container`
     * *jQuery object*
-    * Reference to the parent container. This is where the object renders its template to.
+    Reference to the parent container. This is where the object renders its template to.
  
   * `__setUp( $element )`
-    * `$element` *jQuery object* of the renderables container
-    * Sets up the internal state. Then calls the init.
-    * **This is a internal method not meant to be called outside of the spa object.**
+    * `$element` *jQuery object*
+      * the renderables container
+    Sets up the internal state. Then calls the init.
+    *This is a internal method not meant to be called outside of the spa object.**
  
   * `init()`
-    * Hold the starting logic. This must call `this.renderTemplate`. Default action is reading the template.
+    Hold the starting logic. This must call `this.renderTemplate`. Default action is reading the template.
  
   * `renderTemplate( [context] )`
-    * `context` *Object* render context
-    * renders the template to the objects container. **context** passed will extend `this`.context and be passed to the render.
+    * `context` *Object* 
+      * render context
+    renders the template to the objects container. **context** passed will extend `this`.context and be passed to the render.
 
   * `__delcare( context )`
     * `context` *object* new instance context
@@ -53,7 +55,7 @@ is global namespace object that will hold everything.
 
 
 * ## `Shell` 
-  * The shell is the outer most layer of the Document wrapper. At least one shell must be declared, the `index` shell. The shell implements all `__Renderable` with some new ones and changes
+  The shell is the outer most layer of the Document wrapper. At least one shell must be declared, the `index` shell. The shell implements all `__Renderable` with some new ones and changes
 
   * `add( shell )`
     * `shell` object
