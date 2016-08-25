@@ -8,31 +8,31 @@ is global namespace object that will hold everything.
 `components` *Object* holding
 `$cache` *Object* holding cached jQuery objects
 `errorPages` *object* holding renderable error templates for when things fail
-
+ 
 
 * `spa.__Renderable`
  * This object holds the methods that load, render and manager interaction with the DOM. It is not meant to be used directly but is a base object for other object.
-
+ 
  * `context` *Object* default `{}`
-  * Holds the context to be passed when the template is rendered.
-
+   * Holds the context to be passed when the template is rendered.
+ 
  * `template` *String* default `''`
-  * The main template.
-
+   * The main template.
+ 
  * `setTimeouts` and `setInterval` *Objects* default `{}`
-  * Holds references to timeouts and intervals. All must be held here for proper clean up.
-
+   * Holds references to timeouts and intervals. All must be held here for proper clean up.
+ 
  * `$container` *jQuery object*
    * Reference to the parent container. This is where the object renders its template to.
-
+ 
  * `__setUp( $element )`
-  * `$element` *jQuery object* of the renderables container
-  * Sets up the internal state. Then calls the init.
-  * **This is a internal method not meant to be called outside of the spa object.**
-
+   * `$element` *jQuery object* of the renderables container
+   * Sets up the internal state. Then calls the init.
+   * **This is a internal method not meant to be called outside of the spa object.**
+ 
  * `init()`
    * Hold the starting logic. This must call `this.renderTemplate`. Default action is reading the template.
-
+ 
  * `renderTemplate( [context] )`
    * **context** *Object* render context
    * renders the template to the objects container. context passed will extend this.context.
