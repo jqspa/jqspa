@@ -1,6 +1,5 @@
 'use strict';
 
-	function callback(){};
 (function($){
 
 	/*
@@ -60,7 +59,6 @@
 			this.renderTemplate();
 		},
 		renderTemplate: function(context){
-			console.log('context', context)
 			this.$container.html( Mustache.render(
 				this.template,
 				$.extend({}, this.context, context)
@@ -82,7 +80,7 @@
 			}
 		},
 		unload: function(){
-			this.clearSets();
+			this.__clearSets();
 		},
 	};
 
@@ -153,7 +151,8 @@
 			document.title = this.title || document.title;
 		};
 
-		page.resolver = function(url){
+		page.resolver = function(url, isHistortyEvent){
+			isHistortyEvent = isHistortyEvent === undefined ? true :  false;
 			var match = spa.Router.lookup(url, spa.pages);
 
 			if(match === spa.current.page) return false;
@@ -173,7 +172,9 @@
 			match.__setUp(spa.current.shell.$container.find('#spa-shell-page'));
 			spa.current.page = match;
 
-			spa.Router.historyAdd({url: url}, match.title, url);
+			if(isHistortyEvent){
+				spa.Router.historyAdd({url: url}, match.title, url);
+			}
 
 		};
 
@@ -270,19 +271,19 @@ $(document).on("DOMContentLoaded", function(event) {
 	spa.Shell.$container = $(spa.Shell.defualtContainerSelector);
 
 	$( window ).on( "popstate", function( event ) {
-		spa.Page.resolver(window.history.state.url);
+		spa.Page.resolver(window.location.pathname, false);
 	} );
 	/* 
 		load the first route 
 	*/
-	spa.Page.resolver(window.location.pathname);
+	spa.Page.resolver(window.location.pathname, false);
 
 	spa.cache.$loader.hide();
 	spa.Shell.$container.show();
 
 	spa.cache.$body.on('click', '.ajax-link', function(event){
 		event.preventDefault();
-		spa.Page.resolver($(this).attr('href'));
+		spa.Page.resolver( $(this).attr('href') );
 		return false;
 	});
 });

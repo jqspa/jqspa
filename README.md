@@ -1,39 +1,39 @@
 
-## spa
-	`window.spa` is global namespace object that will hold everything.
+#`window.spa` is global namespace object that will hold everything.
 
-## `spa.__Template`
-This class holds the methods that load, render and manager inter action from with the DOM. It is not meant to be used directly.
+`defaults` *Object* holding project default names and settings.
+`shells` *Object* holding all avail shells
+`pages` *Array* of pages ordered
+`components` *Object* holding
+`$cache` *Object* holding cached jQuery objects
+`errorPages` *object* holding renderable error templates for when things fail
 
-`context` Object default `{}`
-Holds the context to be passed to the render function.
 
-`template` String default `''`
-The main template of its object.
+## `spa.__Renderable`
+This object holds the methods that load, render and manager interaction with the DOM. It is not meant to be used directly but is a base object for other object.
 
-`setTimeouts` and `setInterval` Objects default {}
-Objects to hold references to timeouts and intervals. All must be held here for proper clean up.
+`context` *Object* default `{}` Holds the context to be passed when the template is rendered.
 
-`$container` jQuery object
-Reference to the container belongs to. This is where the object renders its template to.
+`template` *String* default `''` The main template.
 
-`__setUp` function
-Arguments
-	`$element` required jQuery object of the objects container
+`setTimeouts` and `setInterval` *Objects* default `{}` Holds references to timeouts and intervals. All must be held here for proper clean up.
+
+`$container` *jQuery object* Reference to the parent container. This is where the object renders its template to.
+
+### `__setUp( $element )`
+  `$element` *jQuery object* of the renderables container
 Sets up the internal state. Then calls the init.
-This is a internal method not meant to be called outside of the spa object.
+**This is a internal method not meant to be called outside of the spa object.**
 
-`init` Function
-Arguments
-	None, user set.
-Hold the starting logic. This must call `this.renderTemplate`. Default action is reading the template.
+### `init()`
+  Hold the starting logic. This must call `this.renderTemplate`. Default action is reading the template.
 
-`renderTemplate` Function
-Arguments
-	`context` Object render context
-renders the template to the objects container. context passed will extend this.context.
+### `renderTemplate( [context] )`
+  **context** *Object* render context
+  renders the template to the objects container. context passed will extend this.context.
 
-`__delcare` Function
+### `__delcare( object )`
+**object** *object* new instance context
 Internal method to aid in instance creation.
 returns new instance.
 
@@ -45,7 +45,7 @@ Clean up object, calls `this.clearSets`
 
 
 ## shell
-The shell is the outer most layer of the Document wrapper. At least one shell must be declared, the `index` shell. The shell implements all `__template` with some new ones and changes
+The shell is the outer most layer of the Document wrapper. At least one shell must be declared, the `index` shell. The shell implements all `__Renderable` with some new ones and changes
 
 # shell methods
 `add` Function
@@ -61,7 +61,7 @@ Updates the shell with a new shell if the new shell is different then the curren
 
 
 ## page
-Pages hold main content, and are routable by default. The page implements all `__template` with some new ones and changes
+Pages hold main content, and are routable by default. The page implements all `__Renderable` with some new ones and changes
 
 `add` Function
 Arguments
@@ -74,7 +74,7 @@ Calls `__Tamplate.renderTemplate` and sets the pages title
 
 
 ## components
-Components are spinets of functionality, think like Java applets or active X components. This where you should place all interactive elements of your application. The component implements all `__template` with some new ones and changes
+Components are spinets of functionality, think like Java applets or active X components. This where you should place all interactive elements of your application. The component implements all `__Renderable` with some new ones and changes
 
 `add` Function
 Arguments
@@ -85,7 +85,7 @@ takes component objects and registers them with the spa.
 
 `$find`
 Arguments
-	`$element` jQuery Object
+	`$element` jQuery Object 
 Find will search a element for components. It will then start each of them.
 
 return Array of components in the element.
