@@ -1,0 +1,22 @@
+{
+  "name": "jqspa",
+  "version": "1.0.0",
+  "description": "is global namespace object that will hold everything.",
+  "main": "spa.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wmantly/jqspa.git"
+  },
+  "author": "William Mantly",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/wmantly/jqspa/issues"
+  },
+  "homepage": "https://github.com/wmantly/jqspa#readme",
+  "dependencies": {
+    "xregexp": "^3.1.1"
+  }
+}
