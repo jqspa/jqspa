@@ -26,16 +26,9 @@ def parseFile(file, pre=None):
 		return ''.join(parseLine(pre+line) for line in file);
 
 if __name__ == "__main__":
+	code = parseFile('src/spa.js')
+
+	with open('spa.js', 'w') as file:
+		file.write(code)
 	with open('spa.min.js', 'w') as file:
-
-		file.write(parseFile('spa.js'))
-
-
-# html_minify('  <p>yolo<a  href="/" >o </a >     <!-- hello --></p>')
-# '<p>yolo<a href="/" >o </a > </p>'
-
-# js_minify('var i = 1; i += 2 ;\n alert( "hello  "  ); //hi')
-# 'var i=1;i+=2;alert("hello  ");'
-
-# css_minify('body {width: 50px;}\np {margin-top: 1em;/* hi */  }', comments=False)
-# '@charset utf-8;body{width:50px}p{margin-top:1em}'
+		file.write(js_gcc(code))
