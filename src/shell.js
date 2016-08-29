@@ -23,9 +23,5 @@ spa.Shell = ( function(){
 		shell.__setUp(this.$container);
 	};
 
-	$(document).on("DOMContentLoaded", function(event) {
-		spa.Shell.$container = jQuery(this.defualtContainerSelector);
-	});
-
 	return shell;
 } )();

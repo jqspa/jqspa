@@ -1,5 +1,5 @@
 spa.components = {};
-spa.Component = (function(){
+spa.Component = ( function(){
 	var component = Object.create(spa.__RenderBase);
 
 	component.add =function(component){
@@ -11,9 +11,8 @@ spa.Component = (function(){
 
 	component.$find = function($element, dontStart){
 		var components = [];
-
 		$element.find('[data-component-name]').each(function(element){
-			var $this = $(this);
+			var $this = jQuery(this);
 			var componentName = $this.data('component-name');
 			var component = spa.components[componentName];
 			
@@ -31,7 +30,7 @@ spa.Component = (function(){
 		});
 
 		return components;
-	}
+	};
 
 	return component;
-})();
+} )();
