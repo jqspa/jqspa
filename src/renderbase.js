@@ -1,41 +1,26 @@
-spa.__RenderBase = {
-	context: {},
-	template: '',
-	setTimeouts: {},
-	setInterval: {},
-	errorTemplates: {},
-	$container: null,
+spa.__RenderBase = ( function(){
+	var __RenderBase = Object.create(spa.__EventBase);
 
-	__setUp: function($element){
+	__RenderBase.context = {};
+	__RenderBase.template = '';
+	__RenderBase.errorTemplates = {};
+
+	__RenderBase.__setUp = function($element){
 		this.$container = $element;
 		this.init();
-	},
+	};
 
-	init: function(){
+	__RenderBase.init = function(){
 		this.renderTemplate();
 	},
-	renderTemplate: function(context){
+
+	__RenderBase.renderTemplate = function(context){
 		this.$container.html( Mustache.render(
 			this.template,
-			$.extend({}, this.context, context)
+			jQuery.extend({}, this.context, context)
 		) );
 		this.components = spa.Component.$find(this.$container);
-	},
-	__declare: function(object){
-		var newObject = Object.create(this);
+	};
 
-		return $.extend(newObject, {__declare:null}, object);
-	},
-	__clearSets: function(){
-		for(var key in this.setInterval){
-			clearInterval( this.setInterval[key] );
-		}
-
-		for(var key in this.setTimeouts){
-			clearTimeout( this.setTimeouts[key] );
-		}
-	},
-	unload: function(){
-		this.__clearSets();
-	},
-};
+	return __RenderBase;
+} )();

@@ -1,6 +1,8 @@
-'use strict';
+"use strict";
 
-(function($){
+var spa = {};
+
+( function($){
 
 	/*
 		set up dependences
@@ -15,7 +17,7 @@
 	/*
 		set up spa object
 	*/
-	window.spa = {
+	spa = {
 		$cache: {},
 		routes: [],
 		current: {},
@@ -25,12 +27,14 @@
 		}
 	};
 
-	spa.requireScript = function(path){
-		jQuery.ajax({
-	        url: path,
-	        dataType: 'script',
-	        async: false
-    	});
+	spa.includeScript = function(path){
+		$('head').append('<script src="'+path+'">');
+
+		// jQuery.ajax({
+		//        url: path,
+		//        dataType: 'script',
+		//        async: false
+		//    });
 	};
 
 	/*
@@ -39,60 +43,66 @@
 	spa.templatePath = function(path){
 		var string = '';
 		jQuery.ajax({
-	        url: path,
-	        success: function(data){
-	        	string = data
-	        },
-	        async: false
-    	});
-    	return string;
+			url: path,
+			success: function(data){
+				string = data;
+			},
+			async: false
+		});
+		return string;
 	};
 
 })(jQuery);
 
 	/*
+		base object for events
+	*/
+
+	spa.includeScript('/src/eventbase.js');
+
+	/*
 		base object for renderables
 	*/
-	spa.requireScript('/src/renderbase.js');
+	spa.includeScript('/src/renderbase.js');
 
 	/* 
 		error templates
 	*/
-	spa.requireScript('/src/errorpages.js');
+	spa.includeScript('/src/errorpages.js');
 
 	/*
 		Shells
 	*/
-	spa.requireScript('/src/shell.js');
+	spa.includeScript('/src/shell.js');
 
 
 	/*
 		Pages
 	*/
-	spa.requireScript('/src/page.js');
+	spa.includeScript('/src/page.js');
 	
 
 	/*
 		Components
 	*/
-	spa.requireScript('/src/component.js');
+	spa.includeScript('/src/component.js');
 
 	/*
 		router
 	*/
-	spa.requireScript('/src/router.js');
+	spa.includeScript('/src/router.js');
 
 
 /*
 	when the DOM is finished, start the spa
 */
-$(document).on("DOMContentLoaded", function(event) {
+jQuery(document).on("DOMContentLoaded", function(event) {
 	/* $cache stuff */
-	spa.$cache.$loader = $('#spa-loader-holder');
-	spa.$cache.$body = $('body');
-	spa.Shell.$container = $(spa.Shell.defualtContainerSelector);
+	spa.$cache.$loader = jQuery('#spa-loader-holder');
+	spa.$cache.$body = jQuery('body');
+	spa.Shell.$container = jQuery(spa.Shell.defualtContainerSelector);
 
-	$( window ).on( "popstate", function( event ) {
+	jQuery( window ).on( "popstate", function( event ) {
 		spa.Page.resolver(window.location.pathname, false);
 	} );
 	/* 
@@ -105,7 +115,7 @@ $(document).on("DOMContentLoaded", function(event) {
 
 	spa.$cache.$body.on('click', '.ajax-link', function(event){
 		event.preventDefault();
-		spa.Page.resolver( $(this).attr('href') );
+		spa.Page.resolver( jQuery(this).attr('href') );
 		return false;
 	});
 });

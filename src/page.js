@@ -1,5 +1,5 @@
 spa.pages = [];
-spa.Page = (function(){
+spa.Page = ( function(){
 	var page = Object.create(spa.__RenderBase);
 
 	page.add = function(page){
@@ -43,4 +43,4 @@ spa.Page = (function(){
 
 
 	return page;
-})();
+} )();

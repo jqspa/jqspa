@@ -13,7 +13,7 @@ spa.Router = {
 				route.REQ = {
 					url: url,
 					re: re
-				}
+				};
 				match = route;
 				return true;
 			}
@@ -24,7 +24,7 @@ spa.Router = {
 
 	historyAdd: function(state, title, url){
 		window.history.pushState(state, title, url);
-	    // window.dispatchEvent(new Event('popstate'));
+		// window.dispatchEvent(new Event('popstate'));
 
 	}
 

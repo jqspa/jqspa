@@ -14,7 +14,7 @@
 		src="https://cdnjs.cloudflare.com/ajax/libs/xregexp/3.1.1/xregexp-all.min.js"
 	></script>
 
-	<script src="/spa.js"></script>
+	<script src="/spa.min.js"></script>
 
 	<script type="text/javascript">
 
@@ -73,7 +73,8 @@
 			name: 'clock',
 			template: '<div id="spa-clock-text">The Time Is:</div><div id="spa-clock-time">{{hour}}:{{minute}}:{{second}}</div>',
 			init: function(){
-				this.setInterval.refresh = window.setInterval(function(component){
+				console.log(this.setInterval)
+				this.setInterval( 'refresh', function(component){
 					var time = new Date();
 					
 					component.renderTemplate({
@@ -81,6 +82,7 @@
 						minute: time.getMinutes(),
 						second: time.getSeconds()
 					});
+
 				}, 500, this);
 			}
 		});

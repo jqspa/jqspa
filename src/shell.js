@@ -1,5 +1,5 @@
 spa.shells = {};
-spa.Shell = (function(){
+spa.Shell = ( function(){
 	var shell = Object.create(spa.__RenderBase);
 
 	shell.defualtContainerSelector = '#spa-shell';
@@ -24,8 +24,8 @@ spa.Shell = (function(){
 	};
 
 	$(document).on("DOMContentLoaded", function(event) {
-		spa.Shell.$container = $(this.defualtContainerSelector);
+		spa.Shell.$container = jQuery(this.defualtContainerSelector);
 	});
 
-	return shell
-})();
+	return shell;
+} )();
