@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import re, requests
-from css_html_js_minify import html_minify, js_minify, css_minify
 
 def js_gcc(code):
 	res = requests.post('https://closure-compiler.appspot.com/compile', {
@@ -10,19 +9,22 @@ def js_gcc(code):
 		'compilation_level': 'SIMPLE_OPTIMIZATIONS',
 		'js_code' : code,
 	})
-	print(res)
+
 	return res.text
 
 def parseLine(line):
- 	match = re.match(
- 		'^(?P<pre>[\s\t]*)spa\.includeScript\([\s\t]*[\'\"]\/?(?P<dir>.+)[\'\"][\s\t]*\)',line, re.X)
+ 	match = re.match('^(?P<pre>[\s\t]*)spa\.includeScript\([\s\t]*[\'\"]\/?(?P<dir>.+)[\'\"][\s\t]*\)',line, re.X)
+ 	
  	if match:
+ 		
  		return parseFile(match.groupdict()['dir'], match.groupdict()['pre'])
+ 	
  	return line
 
 def parseFile(file, pre=None):
 	pre = pre if pre else ''
 	with open(file) as file:
+		
 		return ''.join(parseLine(pre+line) for line in file);
 
 if __name__ == "__main__":
@@ -32,3 +34,6 @@ if __name__ == "__main__":
 		file.write(code)
 	with open('spa.min.js', 'w') as file:
 		file.write(js_gcc(code))
+
+	print('built')
+	exit(0)

@@ -9,7 +9,7 @@ var spa = {};
 	/*
 		delay calling document.ready until SPA is loaded.
 	*/
-	$.holdReady(true);
+	jQuery.holdReady(true);
 
 	/*
 		set up spa object
@@ -52,14 +52,8 @@ var spa = {};
 })(jQuery);
 
 /*
-	load dependences
-*/
-spa.includeScript('lib/xregexp-all.js');
-
-/*
 	base object for events
 */
-
 spa.includeScript('/src/eventbase.js');
 
 /*
