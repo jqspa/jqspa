@@ -20,8 +20,8 @@
 
 		spa.Shell.add({
 			name: 'index',
-			template: spa.templatePath('/shells/template.html')
-		})
+			template: spa.includeTemplate('/shells/template.html')
+		});
 
 		/*
 			routes
@@ -30,14 +30,14 @@
 		spa.Page.add({
 			uri: '^$',
 			title: 'home',
-			template: spa.templatePath('/pages/home.html'),
+			template: spa.includeTemplate('/pages/home.html'),
 			context: {}
 		});
 
 		spa.Page.add({
 			uri: '^about$',
 			title: 'About',
-			template: spa.templatePath('/pages/about.html'),
+			template: spa.includeTemplate('/pages/about.html'),
 			context: {}
 		});
 
@@ -50,7 +50,7 @@
 		spa.Page.add({
 			uri: '^(?<name>[a-z]+)/(?<id> [0-9]+)',
 			title: 'User Info',
-			template: spa.templatePath('/pages/user.html'),
+			template: spa.includeTemplate('/pages/user.html'),
 			init: function(){
 				// this.context = this.res;
 				this.renderTemplate(this.REQ.re);
@@ -89,7 +89,7 @@
 
 		spa.Component.add({
 			name: 'reddit',
-			template: spa.templatePath('/components/reddit.html'),
+			template: spa.includeTemplate('/components/reddit.html'),
 			init: function(){
 				var component = this;
 				$.get('https://www.reddit.com/.json', function (data) {

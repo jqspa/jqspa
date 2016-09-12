@@ -1,7 +1,5 @@
 "use strict";
 
-
-
 var spa = {};
 
 ( function($){
@@ -28,16 +26,16 @@ var spa = {};
 		// $('head').append('<script src="'+path+'">');
 
 		jQuery.ajax({
-		       url: path,
-		       dataType: 'script',
-		       async: false
-		   });
+			url: path,
+			dataType: 'script',
+			async: false
+		});
 	};
 
 	/*
 		grab templates from the server
 	*/
-	spa.templatePath = function(path){
+	spa.includeTemplate = function(path){
 		var string = '';
 		jQuery.ajax({
 			url: path,
