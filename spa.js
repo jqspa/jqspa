@@ -16,10 +16,20 @@ var spa = {};
 		$cache: {},
 		routes: [],
 		current: {},
-		components: {},
 		defualts: {
 			shell: 'index'
 		}
+	};
+
+	spa.inits = [];
+	spa.init = function(callback){
+		spa.inits.push(callback);
+	};
+
+	spa.onInit = function(){
+		spa.inits.forEach(function(callback){
+			callback();
+		});
 	};
 
 	spa.includeScript = function(path){
@@ -61,11 +71,11 @@ spa.__EventBase = ( function(){
 
 
 	__EventBase.on = function(event, data, callback){
-		return this.$container.on.apply(this, arguments);
+		return this.$container.on.apply(this.$container, arguments);
 	};
 
-	__EventBase.triger = function(event, data, callback){
-		return this.$container.triger.apply(this, arguments);
+	__EventBase.trigger = function(event, data, callback){
+		return this.$container.trigger.apply(this.$container, arguments);
 	};
 
 	__EventBase.setTimeOut = function(name, callback, delay, args){
@@ -140,6 +150,42 @@ spa.__RenderBase = ( function(){
 	return __RenderBase;
 } )();
 
+/*
+	Servcies
+*/
+spa.services = {};
+spa.Service = ( function(){
+	var service = Object.create(spa.__EventBase);
+
+	service.add = function(service){
+		if(!service.name) return false;
+
+		service = this.__declare(service);
+
+		spa.services[service.name] = service;
+	};
+
+	return service;
+} )();
+
+/*
+	Models
+*/
+spa.models = {};
+spa.Model = ( function(){
+	var model = Object.create(spa.__EventBase);
+
+	model.add = function(model){
+		if(!model.name) return false;
+
+		model = this.__declare(model);
+
+		spa.models[model.name] = model;
+	};
+
+	return model;
+})();
+
 /* 
 	error templates
 */
@@ -160,7 +206,7 @@ spa.shells = {};
 spa.Shell = ( function(){
 	var shell = Object.create(spa.__RenderBase);
 
-	shell.defualtContainerSelector = '#spa-shell';
+	shell.defualtContainerSelector = '#spa-shell'; // move me
 
 	shell.add = function(shell){
 		if(!shell.name) return false;
@@ -169,6 +215,7 @@ spa.Shell = ( function(){
 
 		spa.shells[shell.name] = shell;
 	};
+	
 	shell.renderTemplate = function(context, callback){
 		spa.__RenderBase.renderTemplate.call(this, context);
 	};
@@ -321,9 +368,17 @@ jQuery(document).on("DOMContentLoaded", function(event) {
 	spa.$cache.$body = jQuery('body');
 	spa.Shell.$container = jQuery(spa.Shell.defualtContainerSelector);
 
-	jQuery( window ).on( "popstate", function( event ) {
+	jQuery(window).on( "popstate", function( event ) {
 		spa.Page.resolver(window.location.pathname, false);
 	} );
+
+	spa.$cache.$body.on('click', '.ajax-link', function(event){
+		event.preventDefault();
+		spa.Page.resolver( jQuery(this).attr('href') );
+		return false;
+	});
+	
+	spa.onInit();
 	/* 
 		load the first route 
 	*/
@@ -332,9 +387,4 @@ jQuery(document).on("DOMContentLoaded", function(event) {
 	spa.$cache.$loader.hide();
 	spa.Shell.$container.show();
 
-	spa.$cache.$body.on('click', '.ajax-link', function(event){
-		event.preventDefault();
-		spa.Page.resolver( jQuery(this).attr('href') );
-		return false;
-	});
 });
