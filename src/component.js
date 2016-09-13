@@ -1,6 +1,6 @@
 spa.components = {};
 spa.Component = ( function(){
-	var component = Object.create(spa.__RenderBase);
+	var component = Object.create(spa.RenderBase);
 
 	component.add =function(component){
 		if(!component.name) return false;

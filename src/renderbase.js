@@ -1,20 +1,20 @@
-spa.__RenderBase = ( function(){
-	var __RenderBase = Object.create(spa.__EventBase);
+spa.RenderBase = ( function(){
+	var RenderBase = Object.create(spa.EventBase);
 
-	__RenderBase.context = {};
-	__RenderBase.template = '';
-	__RenderBase.errorTemplates = {};
+	RenderBase.context = {};
+	RenderBase.template = '';
+	RenderBase.errorTemplates = {};
 
-	__RenderBase.__setUp = function($element){
+	RenderBase.__setUp = function($element){
 		this.$container = $element;
 		this.init();
 	};
 
-	__RenderBase.init = function(){
+	RenderBase.init = function(){
 		this.renderTemplate();
 	},
 
-	__RenderBase.renderTemplate = function(context){
+	RenderBase.renderTemplate = function(context){
 		this.$container.html( Mustache.render(
 			this.template,
 			jQuery.extend({}, this.context, context)
@@ -22,5 +22,5 @@ spa.__RenderBase = ( function(){
 		this.components = spa.Component.$find(this.$container);
 	};
 
-	return __RenderBase;
+	return RenderBase;
 } )();

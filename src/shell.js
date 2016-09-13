@@ -1,6 +1,6 @@
 spa.shells = {};
 spa.Shell = ( function(){
-	var shell = Object.create(spa.__RenderBase);
+	var shell = Object.create(spa.RenderBase);
 
 	shell.defualtContainerSelector = '#spa-shell'; // move me
 
@@ -11,9 +11,9 @@ spa.Shell = ( function(){
 
 		spa.shells[shell.name] = shell;
 	};
-	
+
 	shell.renderTemplate = function(context, callback){
-		spa.__RenderBase.renderTemplate.call(this, context);
+		spa.RenderBase.renderTemplate.call(this, context);
 	};
 
 	shell.update = function(shell){

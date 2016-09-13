@@ -15,7 +15,6 @@ var spa = {};
 	spa = {
 		$cache: {},
 		routes: [],
-		current: {},
 		defualts: {
 			shell: 'index'
 		}

@@ -1,6 +1,6 @@
 spa.pages = [];
 spa.Page = ( function(){
-	var page = Object.create(spa.__RenderBase);
+	var page = Object.create(spa.RenderBase);
 
 	page.add = function(page){
 		if(!page.uri) return false;
@@ -10,7 +10,7 @@ spa.Page = ( function(){
 	};
 
 	page.renderTemplate = function(context, callback){
-		spa.__RenderBase.renderTemplate.call(this, context);
+		spa.RenderBase.renderTemplate.call(this, context);
 		document.title = this.title || document.title;
 	};
 

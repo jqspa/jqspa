@@ -15,7 +15,6 @@ var spa = {};
 	spa = {
 		$cache: {},
 		routes: [],
-		current: {},
 		defualts: {
 			shell: 'index'
 		}
@@ -62,23 +61,23 @@ var spa = {};
 /*
 	base object for events
 */
-spa.__EventBase = ( function(){
-	var __EventBase = {};
-	__EventBase.setTimeoutMap = {};
-	__EventBase.setIntervalMap = {};
-	__EventBase.listeners = {};
-	__EventBase.$container = jQuery({});
+spa.EventBase = ( function(){
+	var EventBase = {};
+	EventBase.setTimeoutMap = {};
+	EventBase.setIntervalMap = {};
+	EventBase.listeners = {};
+	EventBase.$container = jQuery({});
 
 
-	__EventBase.on = function(event, data, callback){
+	EventBase.on = function(event, data, callback){
 		return this.$container.on.apply(this.$container, arguments);
 	};
 
-	__EventBase.trigger = function(event, data, callback){
+	EventBase.trigger = function(event, data, callback){
 		return this.$container.trigger.apply(this.$container, arguments);
 	};
 
-	__EventBase.setTimeOut = function(name, callback, delay, args){
+	EventBase.setTimeOut = function(name, callback, delay, args){
 		this.setTimeoutMap[name] = window.setTimeOut.apply(
 			window,
 			Array.apply(this, arguments).splice(1)
@@ -87,7 +86,7 @@ spa.__EventBase = ( function(){
 		return this.setTimeoutMap[name];
 	};
 
-	__EventBase.setInterval = function(name, callback, delay, args){
+	EventBase.setInterval = function(name, callback, delay, args){
 
 		this.setIntervalMap[name] = window.setInterval.apply(
 			window,
@@ -97,7 +96,7 @@ spa.__EventBase = ( function(){
 		return this.setIntervalMap[name];
 	};
 
-	__EventBase.__clearSets = function(){
+	EventBase.__clearSets = function(){
 		for(var key in this.setIntervalMap){
 			clearInterval( this.setIntervalMap[key] );
 		}
@@ -107,39 +106,66 @@ spa.__EventBase = ( function(){
 		}
 	};
 
-	__EventBase.unload =  function(){
+	EventBase.unload =  function(){
 		this.__clearSets();
 	};
 
-	__EventBase.__declare =  function(object){
+	EventBase.__declare =  function(object){
 		var newObject = Object.create(this);
 
-		return jQuery.extend(newObject, {__declare:null}, object);
+		return jQuery.extend(newObject, object);
 	};
 
-	return __EventBase;
+	/*
+		pub/sub
+	*/
+
+	EventBase.__topics = {};
+
+	EventBase.subscribe = function(topic, listener) {
+		// create the topic if not yet created
+		if(!this.__topics[topic]) this.__topics[topic] = [];
+
+		// add the listener
+		this.__topics[topic].push(listener);
+	}
+
+	EventBase.publish = function(topic, data) {
+		// return if the topic doesn't exist, or there are no listeners
+		if(!this.__topics[topic] || this.__topics[topic].length < 1) return;
+
+		// send the event to all listeners
+		this.__topics[topic].forEach(function(listener) {
+			listener(data || {});
+		});
+	}
+
+
+
+
+	return EventBase;
 } )();
 
 /*
 	base object for renderables
 */
-spa.__RenderBase = ( function(){
-	var __RenderBase = Object.create(spa.__EventBase);
+spa.RenderBase = ( function(){
+	var RenderBase = Object.create(spa.EventBase);
 
-	__RenderBase.context = {};
-	__RenderBase.template = '';
-	__RenderBase.errorTemplates = {};
+	RenderBase.context = {};
+	RenderBase.template = '';
+	RenderBase.errorTemplates = {};
 
-	__RenderBase.__setUp = function($element){
+	RenderBase.__setUp = function($element){
 		this.$container = $element;
 		this.init();
 	};
 
-	__RenderBase.init = function(){
+	RenderBase.init = function(){
 		this.renderTemplate();
 	},
 
-	__RenderBase.renderTemplate = function(context){
+	RenderBase.renderTemplate = function(context){
 		this.$container.html( Mustache.render(
 			this.template,
 			jQuery.extend({}, this.context, context)
@@ -147,7 +173,7 @@ spa.__RenderBase = ( function(){
 		this.components = spa.Component.$find(this.$container);
 	};
 
-	return __RenderBase;
+	return RenderBase;
 } )();
 
 /*
@@ -155,7 +181,7 @@ spa.__RenderBase = ( function(){
 */
 spa.services = {};
 spa.Service = ( function(){
-	var service = Object.create(spa.__EventBase);
+	var service = Object.create(spa.EventBase);
 
 	service.add = function(service){
 		if(!service.name) return false;
@@ -173,7 +199,7 @@ spa.Service = ( function(){
 */
 spa.models = {};
 spa.Model = ( function(){
-	var model = Object.create(spa.__EventBase);
+	var model = Object.create(spa.EventBase);
 
 	model.add = function(model){
 		if(!model.name) return false;
@@ -189,12 +215,12 @@ spa.Model = ( function(){
 /* 
 	error templates
 */
-spa.__RenderBase.errorTemplates['404'] = spa.__RenderBase.__declare({
+spa.RenderBase.errorTemplates['404'] = spa.RenderBase.__declare({
 	template: '<center><h1><i>Page {{name}} Not Found</i></h1>{{message}}<center>',
 	title: '404'
 });
 
-spa.__RenderBase.errorTemplates['500'] = spa.__RenderBase.__declare({
+spa.RenderBase.errorTemplates['500'] = spa.RenderBase.__declare({
 	title: '500',
 	template: '<center><h1><i>SPA error {{name}}</i></h1>{{message}}<center>'
 });
@@ -204,7 +230,7 @@ spa.__RenderBase.errorTemplates['500'] = spa.__RenderBase.__declare({
 */
 spa.shells = {};
 spa.Shell = ( function(){
-	var shell = Object.create(spa.__RenderBase);
+	var shell = Object.create(spa.RenderBase);
 
 	shell.defualtContainerSelector = '#spa-shell'; // move me
 
@@ -215,9 +241,9 @@ spa.Shell = ( function(){
 
 		spa.shells[shell.name] = shell;
 	};
-	
+
 	shell.renderTemplate = function(context, callback){
-		spa.__RenderBase.renderTemplate.call(this, context);
+		spa.RenderBase.renderTemplate.call(this, context);
 	};
 
 	shell.update = function(shell){
@@ -237,7 +263,7 @@ spa.Shell = ( function(){
 */
 spa.pages = [];
 spa.Page = ( function(){
-	var page = Object.create(spa.__RenderBase);
+	var page = Object.create(spa.RenderBase);
 
 	page.add = function(page){
 		if(!page.uri) return false;
@@ -247,7 +273,7 @@ spa.Page = ( function(){
 	};
 
 	page.renderTemplate = function(context, callback){
-		spa.__RenderBase.renderTemplate.call(this, context);
+		spa.RenderBase.renderTemplate.call(this, context);
 		document.title = this.title || document.title;
 	};
 
@@ -288,7 +314,7 @@ spa.Page = ( function(){
 */
 spa.components = {};
 spa.Component = ( function(){
-	var component = Object.create(spa.__RenderBase);
+	var component = Object.create(spa.RenderBase);
 
 	component.add =function(component){
 		if(!component.name) return false;

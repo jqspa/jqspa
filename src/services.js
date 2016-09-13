@@ -1,6 +1,6 @@
 spa.services = {};
 spa.Service = ( function(){
-	var service = Object.create(spa.__EventBase);
+	var service = Object.create(spa.EventBase);
 
 	service.add = function(service){
 		if(!service.name) return false;

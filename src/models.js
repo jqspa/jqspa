@@ -1,6 +1,6 @@
 spa.models = {};
 spa.Model = ( function(){
-	var model = Object.create(spa.__EventBase);
+	var model = Object.create(spa.EventBase);
 
 	model.add = function(model){
 		if(!model.name) return false;
