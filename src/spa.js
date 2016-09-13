@@ -16,10 +16,20 @@ var spa = {};
 		$cache: {},
 		routes: [],
 		current: {},
-		components: {},
 		defualts: {
 			shell: 'index'
 		}
+	};
+
+	spa.inits = [];
+	spa.init = function(callback){
+		spa.inits.push(callback);
+	};
+
+	spa.onInit = function(){
+		spa.inits.forEach(function(callback){
+			callback();
+		});
 	};
 
 	spa.includeScript = function(path){
@@ -59,6 +69,16 @@ spa.includeScript('/src/eventbase.js');
 */
 spa.includeScript('/src/renderbase.js');
 
+/*
+	Servcies
+*/
+spa.includeScript('/src/services.js');
+
+/*
+	Models
+*/
+spa.includeScript('/src/models.js');
+
 /* 
 	error templates
 */
@@ -96,9 +116,17 @@ jQuery(document).on("DOMContentLoaded", function(event) {
 	spa.$cache.$body = jQuery('body');
 	spa.Shell.$container = jQuery(spa.Shell.defualtContainerSelector);
 
-	jQuery( window ).on( "popstate", function( event ) {
+	jQuery(window).on( "popstate", function( event ) {
 		spa.Page.resolver(window.location.pathname, false);
 	} );
+
+	spa.$cache.$body.on('click', '.ajax-link', function(event){
+		event.preventDefault();
+		spa.Page.resolver( jQuery(this).attr('href') );
+		return false;
+	});
+	
+	spa.onInit();
 	/* 
 		load the first route 
 	*/
@@ -107,9 +135,4 @@ jQuery(document).on("DOMContentLoaded", function(event) {
 	spa.$cache.$loader.hide();
 	spa.Shell.$container.show();
 
-	spa.$cache.$body.on('click', '.ajax-link', function(event){
-		event.preventDefault();
-		spa.Page.resolver( jQuery(this).attr('href') );
-		return false;
-	});
 });

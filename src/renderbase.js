@@ -14,14 +14,12 @@ spa.__RenderBase = ( function(){
 		this.renderTemplate();
 	},
 
-	__RenderBase.renderTemplate = function(context, callback){
+	__RenderBase.renderTemplate = function(context){
 		this.$container.html( Mustache.render(
 			this.template,
 			jQuery.extend({}, this.context, context)
 		) );
 		this.components = spa.Component.$find(this.$container);
-
-		callback(this);
 	};
 
 	return __RenderBase;

@@ -7,11 +7,11 @@ spa.__EventBase = ( function(){
 
 
 	__EventBase.on = function(event, data, callback){
-		return this.$container.on.apply(this, arguments);
+		return this.$container.on.apply(this.$container, arguments);
 	};
 
-	__EventBase.triger = function(event, data, callback){
-		return this.$container.triger.apply(this, arguments);
+	__EventBase.trigger = function(event, data, callback){
+		return this.$container.trigger.apply(this.$container, arguments);
 	};
 
 	__EventBase.setTimeOut = function(name, callback, delay, args){
