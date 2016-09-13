@@ -1,20 +1,20 @@
-spa.__EventBase = ( function(){
-	var __EventBase = {};
-	__EventBase.setTimeoutMap = {};
-	__EventBase.setIntervalMap = {};
-	__EventBase.listeners = {};
-	__EventBase.$container = jQuery({});
+spa.EventBase = ( function(){
+	var EventBase = {};
+	EventBase.setTimeoutMap = {};
+	EventBase.setIntervalMap = {};
+	EventBase.listeners = {};
+	EventBase.$container = jQuery({});
 
 
-	__EventBase.on = function(event, data, callback){
+	EventBase.on = function(event, data, callback){
 		return this.$container.on.apply(this.$container, arguments);
 	};
 
-	__EventBase.trigger = function(event, data, callback){
+	EventBase.trigger = function(event, data, callback){
 		return this.$container.trigger.apply(this.$container, arguments);
 	};
 
-	__EventBase.setTimeOut = function(name, callback, delay, args){
+	EventBase.setTimeOut = function(name, callback, delay, args){
 		this.setTimeoutMap[name] = window.setTimeOut.apply(
 			window,
 			Array.apply(this, arguments).splice(1)
@@ -23,7 +23,7 @@ spa.__EventBase = ( function(){
 		return this.setTimeoutMap[name];
 	};
 
-	__EventBase.setInterval = function(name, callback, delay, args){
+	EventBase.setInterval = function(name, callback, delay, args){
 
 		this.setIntervalMap[name] = window.setInterval.apply(
 			window,
@@ -33,7 +33,7 @@ spa.__EventBase = ( function(){
 		return this.setIntervalMap[name];
 	};
 
-	__EventBase.__clearSets = function(){
+	EventBase.__clearSets = function(){
 		for(var key in this.setIntervalMap){
 			clearInterval( this.setIntervalMap[key] );
 		}
@@ -43,15 +43,42 @@ spa.__EventBase = ( function(){
 		}
 	};
 
-	__EventBase.unload =  function(){
+	EventBase.unload =  function(){
 		this.__clearSets();
 	};
 
-	__EventBase.__declare =  function(object){
+	EventBase.__declare =  function(object){
 		var newObject = Object.create(this);
 
-		return jQuery.extend(newObject, {__declare:null}, object);
+		return jQuery.extend(newObject, object);
 	};
 
-	return __EventBase;
+	/*
+		pub/sub
+	*/
+
+	EventBase.__topics = {};
+
+	EventBase.subscribe = function(topic, listener) {
+		// create the topic if not yet created
+		if(!this.__topics[topic]) this.__topics[topic] = [];
+
+		// add the listener
+		this.__topics[topic].push(listener);
+	}
+
+	EventBase.publish = function(topic, data) {
+		// return if the topic doesn't exist, or there are no listeners
+		if(!this.__topics[topic] || this.__topics[topic].length < 1) return;
+
+		// send the event to all listeners
+		this.__topics[topic].forEach(function(listener) {
+			listener(data || {});
+		});
+	}
+
+
+
+
+	return EventBase;
 } )();
