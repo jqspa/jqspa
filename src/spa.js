@@ -1,5 +1,5 @@
 "use strict";
-
+/* globals jQuery, $, spa */
 var spa = spa || {};
 
 ( function($){

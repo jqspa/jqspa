@@ -1,5 +1,5 @@
 "use strict";
-
+/* globals jQuery, $, spa */
 var spa = spa || {};
 
 ( function($){
@@ -129,7 +129,7 @@ spa.EventBase = ( function(){
 		var topic, previous = [];
 		if(!$.isArray(topics)) topics = [topics];
 		for(var idx = topics.length; idx--;){
-			topic = topics[idx]
+			topic = topics[idx];
 			if(!~previous.indexOf(topic)) continue;
 			if(!Object.hasOwnProperty(this.__topics, topic)) {
 				this.__topics[topic] = [];
@@ -139,7 +139,7 @@ spa.EventBase = ( function(){
 			this.__topics[topic].push(listener);
 			previous.push(topic);
 		}
-	}
+	};
 
 	EventBase.publish = function(topic, data) {
 		// return if the topic doesn't exist, or there are no listeners
@@ -151,7 +151,7 @@ spa.EventBase = ( function(){
 				listener(data || {});
 			}, 0, data);
 		});
-	}
+	};
 
 
 
@@ -178,7 +178,7 @@ spa.RenderBase = ( function(){
 	RenderBase.init = function(){
 		// BAD?
 		this.renderTemplate();
-	},
+	};
 
 	RenderBase.renderTemplate = function(context){
 		this.$container.html( Mustache.render(

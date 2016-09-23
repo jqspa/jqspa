@@ -14,7 +14,7 @@ spa.RenderBase = ( function(){
 	RenderBase.init = function(){
 		// BAD?
 		this.renderTemplate();
-	},
+	};
 
 	RenderBase.renderTemplate = function(context){
 		this.$container.html( Mustache.render(
