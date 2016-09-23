@@ -91,11 +91,6 @@ spa.includeScript('/src/errorpages.js');
 spa.includeScript('/src/shell.js');
 
 /*
-	Pages
-*/
-spa.includeScript('/src/page.js');
-
-/*
 	Components
 */
 spa.includeScript('/src/component.js');
