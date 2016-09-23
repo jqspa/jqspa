@@ -417,6 +417,7 @@ spa.init(function(){
         /* 
             load the first route 
         */
+        jQuery.holdReady(false);
         spa.EventBase.publish("load-shell", {
             "path": window.location.pathname,
             "isHistory": false
@@ -448,8 +449,7 @@ spa.init(function(){
     }());
 
 });
-
-spa.onInit();
+jQuery(window).load(spa.onInit);
 /*
 	when the DOM is finished, start the spa
 */

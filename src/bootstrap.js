@@ -27,6 +27,7 @@ spa.init(function(){
         /* 
             load the first route 
         */
+        jQuery.holdReady(false);
         spa.EventBase.publish("load-shell", {
             "path": window.location.pathname,
             "isHistory": false
