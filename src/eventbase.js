@@ -14,8 +14,8 @@ spa.EventBase = ( function(){
 		return this.$container.trigger.apply(this.$container, arguments);
 	};
 
-	EventBase.setTimeOut = function(name, callback, delay, args){
-		this.setTimeoutMap[name] = window.setTimeOut.apply(
+	EventBase.setTimeout = function(name, callback, delay, args){
+		this.setTimeoutMap[name] = window.setTimeout.apply(
 			window,
 			Array.apply(this, arguments).splice(1)
 		);
@@ -53,6 +53,7 @@ spa.EventBase = ( function(){
 		return jQuery.extend(newObject, object);
 	};
 
+	EventBase.init =  function(){};
 	/*
 		pub/sub
 	*/
@@ -65,8 +66,8 @@ spa.EventBase = ( function(){
 		if(!$.isArray(topics)) topics = [topics];
 		for(var idx = topics.length; idx--;){
 			topic = topics[idx];
-			if(!~previous.indexOf(topic)) continue;
-			if(!Object.hasOwnProperty(this.__topics, topic)) {
+			if(~previous.indexOf(topic)) continue;
+			if(!Object.hasOwnProperty.call(this.__topics, topic)) {
 				this.__topics[topic] = [];
 			}
 
@@ -82,7 +83,7 @@ spa.EventBase = ( function(){
 
 		// send the event to all listeners
 		this.__topics[topic].forEach(function(listener) {
-			this.setTimeout(function(data){
+			setTimeout(function(data){
 				listener(data || {});
 			}, 0, data);
 		});
