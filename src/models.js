@@ -8,6 +8,8 @@ spa.Model = ( function(){
 		model = this.__declare(model);
 
 		spa.models[model.name] = model;
+        
+        model.init();
 	};
 
 	return model;

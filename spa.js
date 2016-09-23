@@ -1,6 +1,6 @@
 "use strict";
-
-var spa = {};
+/* globals jQuery, Mustache, XRegExp, $, spa */
+var spa = spa || {};
 
 ( function($){
 
@@ -12,14 +12,15 @@ var spa = {};
 	/*
 		set up spa object
 	*/
-	spa = {
+	jQuery.extend(spa, {
+		buildTaskCount: 0,
 		$cache: {},
 		routes: [],
 		current: {},
 		defualts: {
 			shell: 'index'
 		}
-	};
+	});
 
 	spa.inits = [];
 	spa.init = function(callback){
@@ -123,13 +124,22 @@ spa.EventBase = ( function(){
 
 	EventBase.__topics = {};
 
-	EventBase.subscribe = function(topic, listener) {
+	EventBase.subscribe = function(topics, listener) {
 		// create the topic if not yet created
-		if(!this.__topics[topic]) this.__topics[topic] = [];
+		var topic, previous = [];
+		if(!$.isArray(topics)) topics = [topics];
+		for(var idx = topics.length; idx--;){
+			topic = topics[idx];
+			if(!~previous.indexOf(topic)) continue;
+			if(!Object.hasOwnProperty(this.__topics, topic)) {
+				this.__topics[topic] = [];
+			}
 
-		// add the listener
-		this.__topics[topic].push(listener);
-	}
+			// add the listener
+			this.__topics[topic].push(listener);
+			previous.push(topic);
+		}
+	};
 
 	EventBase.publish = function(topic, data) {
 		// return if the topic doesn't exist, or there are no listeners
@@ -137,9 +147,11 @@ spa.EventBase = ( function(){
 
 		// send the event to all listeners
 		this.__topics[topic].forEach(function(listener) {
-			listener(data || {});
+			this.setTimeout(function(data){
+				listener(data || {});
+			}, 0, data);
 		});
-	}
+	};
 
 
 
@@ -159,21 +171,46 @@ spa.RenderBase = ( function(){
 
 	RenderBase.__setUp = function($element){
 		this.$container = $element;
+		this.$container.addClass(this.name);
 		this.init();
 	};
 
 	RenderBase.init = function(){
+		// BAD?
 		this.renderTemplate();
-	},
+	};
 
 	RenderBase.renderTemplate = function(context){
 		this.$container.html( Mustache.render(
 			this.template,
 			jQuery.extend({}, this.context, context)
 		) );
-		this.components = spa.Component.$find(this.$container);
+		this.components = this.$find(this.$container);
 	};
 
+	RenderBase.$find = function($element, dontStart){
+		var components = [];
+		$element.find('[data-component-name]').each(function(index, element){
+
+			var $element = jQuery(element);
+			var componentName = $element.data('component-name');
+			var component = spa.components[componentName];
+			
+			//set error component if none is found
+			if(!component){
+				component = spa.Component.errorTemplates['404'];
+				component.context = {
+					name: componentName
+				};
+			}else{
+				components.push(component);
+			}
+
+			component.__setUp($element);
+		});
+
+		return components;
+	};
 	return RenderBase;
 } )();
 
@@ -208,6 +245,8 @@ spa.Model = ( function(){
 		model = this.__declare(model);
 
 		spa.models[model.name] = model;
+        
+        model.init();
 	};
 
 	return model;
@@ -258,58 +297,6 @@ spa.Shell = ( function(){
 	return shell;
 } )();
 
-
-/*
-	Pages
-*/
-spa.pages = [];
-spa.Page = ( function(){
-	var page = Object.create(spa.RenderBase);
-
-	page.add = function(page){
-		if(!page.uri) return false;
-
-		page = this.__declare(page);
-		spa.pages.push(page);
-	};
-
-	page.renderTemplate = function(context, callback){
-		spa.RenderBase.renderTemplate.call(this, context);
-		document.title = this.title || document.title;
-	};
-
-	page.resolver = function(url, isHistortyEvent){
-		isHistortyEvent = isHistortyEvent === undefined ? true :  false;
-		var match = spa.Router.lookup(url, spa.pages);
-
-		if(match === spa.current.page) return false;
-		if(!match){
-			match = this.errorTemplates['404'];
-
-			match.context = {
-				name: url
-			};
-		}
-		if(spa.current.page){
-			spa.current.page.unload();
-		}
-
-		spa.Shell.update(match.shell);
-
-		match.__setUp(spa.current.shell.$container.find('#spa-shell-page'));
-		spa.current.page = match;
-
-		if(isHistortyEvent){
-			spa.Router.historyAdd({url: url}, match.title, url);
-		}
-
-	};
-
-
-	return page;
-} )();
-
-
 /*
 	Components
 */
@@ -324,38 +311,28 @@ spa.Component = ( function(){
 		spa.components[component.name] = component;
 	};
 
-	component.$find = function($element, dontStart){
-		var components = [];
-		$element.find('[data-component-name]').each(function(element){
-			var $this = jQuery(this);
-			var componentName = $this.data('component-name');
-			var component = spa.components[componentName];
-			
-			//set error component if none is found
-			if(!component){
-				component = spa.Component.errorTemplates['404'];
-				component.context = {
-					name: componentName
-				};
-			}else{
-				components.push(component);
-			}
-
-			component.__setUp($this);
-		});
-
-		return components;
-	};
 
 	return component;
 } )();
-
 /*
 	router
 */
 spa.routes = [];
 spa.Router = {
-	defaultRoute: spa.pages,
+	defaultRoute: spa.routes,
+
+	add: function(route){
+
+		if( $.isArray(route) ){
+			route.forEach(this.add);
+			return ;
+		}
+
+		if(!route.uri && !route.init) return false;
+
+		spa.routes.push( route );
+		return true;
+	},
 
 	lookup: function(url, routes){
 		var match = false;
@@ -377,6 +354,29 @@ spa.Router = {
 		return match;
 	},
 
+	resolver: function(url, isHistortyEvent){
+		isHistortyEvent = isHistortyEvent === undefined ? true :  false;
+		var match = this.lookup(url);
+
+		 // if(spa.current.page && match.REQ.re[0] === spa.current.page.REQ.re[0]) return false;
+
+		if(!match){
+			match = spa.RenderBase.errorTemplates['404'];
+
+			match.context = {
+				name: url
+			};
+		}
+		
+		spa.Shell.update(match.shell);
+		match.init();
+
+		if(isHistortyEvent){
+			spa.Router.historyAdd({url: url}, match.title, url);
+		}
+
+	},
+
 	historyAdd: function(state, title, url){
 		window.history.pushState(state, title, url);
 		// window.dispatchEvent(new Event('popstate'));
@@ -385,33 +385,75 @@ spa.Router = {
 
 };
 
+/*
+	bootstrap
+*/
+spa.init(function(){
+    spa.EventBase.subscribe("__dom-content-loaded-start", function(){
+        /* $cache stuff */
+        spa.$cache.$loader = jQuery('#spa-loader-holder');
+        spa.$cache.$body = jQuery('body');
+        spa.Shell.$container = jQuery(spa.Shell.defualtContainerSelector);
 
+        jQuery(window).on( "popstate", function( event ) {
+            spa.EventBase.publish("load-shell", {
+                "path": window.location.pathname,
+                "isHistory": false
+            });
+        } );
+
+        spa.$cache.$body.on('click', '.ajax-link', function(event){
+            event.preventDefault();
+            spa.EventBase.publish("load-shell", {
+                "path": jQuery(this).attr('href'),
+                "isHistory": true
+            });
+            return false;
+        });
+        
+    });
+
+    spa.EventBase.subscribe("__spa-ready", function(){
+        /* 
+            load the first route 
+        */
+        spa.EventBase.publish("load-shell", {
+            "path": window.location.pathname,
+            "isHistory": false
+        });
+    });
+
+    spa.EventBase.subscribe("load-shell", function(data){
+
+        spa.Router.resolver(data.path, data.isHistory);
+
+        spa.$cache.$loader.hide();
+        spa.Shell.$container.show();
+    });
+
+    (function(){
+        var buildTaskCount = spa.buildTaskCount;
+
+        spa.EventBase.subscribe("__dom-content-loaded-end", function(data){
+            if (buildTaskCount === 0){
+                spa.EventBase.publish("__spa-ready");
+            }
+        });
+        spa.EventBase.subscribe("spa-build-task-complete", function(data){
+            buildTaskCount--;
+            if (buildTaskCount === 0){
+                spa.EventBase.publish("__spa-ready");
+            }
+        });
+    }());
+
+});
+
+spa.onInit();
 /*
 	when the DOM is finished, start the spa
 */
 jQuery(document).on("DOMContentLoaded", function(event) {
-	/* $cache stuff */
-	spa.$cache.$loader = jQuery('#spa-loader-holder');
-	spa.$cache.$body = jQuery('body');
-	spa.Shell.$container = jQuery(spa.Shell.defualtContainerSelector);
-
-	jQuery(window).on( "popstate", function( event ) {
-		spa.Page.resolver(window.location.pathname, false);
-	} );
-
-	spa.$cache.$body.on('click', '.ajax-link', function(event){
-		event.preventDefault();
-		spa.Page.resolver( jQuery(this).attr('href') );
-		return false;
-	});
-	
-	spa.onInit();
-	/* 
-		load the first route 
-	*/
-	spa.Page.resolver(window.location.pathname, false);
-
-	spa.$cache.$loader.hide();
-	spa.Shell.$container.show();
-
+	spa.EventBase.publish("___dom-content-loaded-start");
+	spa.EventBase.publish("___dom-content-loaded-end");
 });

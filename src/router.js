@@ -1,6 +1,19 @@
 spa.routes = [];
 spa.Router = {
-	defaultRoute: spa.pages,
+	defaultRoute: spa.routes,
+
+	add: function(route){
+
+		if( $.isArray(route) ){
+			route.forEach(this.add);
+			return ;
+		}
+
+		if(!route.uri && !route.init) return false;
+
+		spa.routes.push( route );
+		return true;
+	},
 
 	lookup: function(url, routes){
 		var match = false;
@@ -20,6 +33,29 @@ spa.Router = {
 		}));
 
 		return match;
+	},
+
+	resolver: function(url, isHistortyEvent){
+		isHistortyEvent = isHistortyEvent === undefined ? true :  false;
+		var match = this.lookup(url);
+
+		 // if(spa.current.page && match.REQ.re[0] === spa.current.page.REQ.re[0]) return false;
+
+		if(!match){
+			match = spa.RenderBase.errorTemplates['404'];
+
+			match.context = {
+				name: url
+			};
+		}
+		
+		spa.Shell.update(match.shell);
+		match.init();
+
+		if(isHistortyEvent){
+			spa.Router.historyAdd({url: url}, match.title, url);
+		}
+
 	},
 
 	historyAdd: function(state, title, url){
