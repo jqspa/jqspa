@@ -111,6 +111,7 @@ spa.includeScript('/src/router.js');
 	when the DOM is finished, start the spa
 */
 jQuery(document).on("DOMContentLoaded", function(event) {
+	spa.EventBase.publish("dom-content-loaded")
 	/* $cache stuff */
 	spa.$cache.$loader = jQuery('#spa-loader-holder');
 	spa.$cache.$body = jQuery('body');
