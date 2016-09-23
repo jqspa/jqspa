@@ -12,7 +12,7 @@ var spa = spa || {};
 	/*
 		set up spa object
 	*/
-	jQuery.extend(spa, {
+	spa = jQuery.extend({
 		buildTaskCount: 0,
 		$cache: {},
 		routes: [],
@@ -20,7 +20,7 @@ var spa = spa || {};
 		defualts: {
 			shell: 'index'
 		}
-	});
+	}, spa);
 
 	spa.inits = [];
 	spa.init = function(callback){
@@ -105,11 +105,10 @@ spa.includeScript('/src/router.js');
 */
 spa.includeScript('/src/bootstrap.js');
 
-jQuery(window).load(spa.onInit);
 /*
 	when the DOM is finished, start the spa
 */
 jQuery(document).on("DOMContentLoaded", function(event) {
-	spa.EventBase.publish("___dom-content-loaded-start");
-	spa.EventBase.publish("___dom-content-loaded-end");
+	spa.EventBase.publish("__dom-content-loaded-start");
+	spa.EventBase.publish("__dom-content-loaded-end");
 });

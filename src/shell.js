@@ -2,7 +2,7 @@ spa.shells = {};
 spa.Shell = ( function(){
 	var shell = Object.create(spa.RenderBase);
 
-	shell.defualtContainerSelector = '#spa-shell'; // move me
+	shell.defaultContainerSelector = '#spa-shell'; // move me
 
 	shell.add = function(shell){
 		if(!shell.name) return false;
@@ -17,7 +17,7 @@ spa.Shell = ( function(){
 	};
 
 	shell.update = function(shell){
-		shell = shell || spa.shells[ spa.defualts.shell ];
+		shell = shell || spa.shells[ spa.defaults.shell ];
 		if(spa.current.shell === shell) return false;
 
 		spa.current.shell = shell;

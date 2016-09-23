@@ -12,7 +12,7 @@ var spa = spa || {};
 	/*
 		set up spa object
 	*/
-	jQuery.extend(spa, {
+	spa = jQuery.extend({
 		buildTaskCount: 0,
 		$cache: {},
 		routes: [],
@@ -20,7 +20,7 @@ var spa = spa || {};
 		defualts: {
 			shell: 'index'
 		}
-	});
+	}, spa);
 
 	spa.inits = [];
 	spa.init = function(callback){
@@ -79,8 +79,8 @@ spa.EventBase = ( function(){
 		return this.$container.trigger.apply(this.$container, arguments);
 	};
 
-	EventBase.setTimeOut = function(name, callback, delay, args){
-		this.setTimeoutMap[name] = window.setTimeOut.apply(
+	EventBase.setTimeout = function(name, callback, delay, args){
+		this.setTimeoutMap[name] = window.setTimeout.apply(
 			window,
 			Array.apply(this, arguments).splice(1)
 		);
@@ -118,6 +118,7 @@ spa.EventBase = ( function(){
 		return jQuery.extend(newObject, object);
 	};
 
+	EventBase.init =  function(){};
 	/*
 		pub/sub
 	*/
@@ -130,8 +131,8 @@ spa.EventBase = ( function(){
 		if(!$.isArray(topics)) topics = [topics];
 		for(var idx = topics.length; idx--;){
 			topic = topics[idx];
-			if(!~previous.indexOf(topic)) continue;
-			if(!Object.hasOwnProperty(this.__topics, topic)) {
+			if(~previous.indexOf(topic)) continue;
+			if(!Object.hasOwnProperty.call(this.__topics, topic)) {
 				this.__topics[topic] = [];
 			}
 
@@ -147,7 +148,7 @@ spa.EventBase = ( function(){
 
 		// send the event to all listeners
 		this.__topics[topic].forEach(function(listener) {
-			this.setTimeout(function(data){
+			setTimeout(function(data){
 				listener(data || {});
 			}, 0, data);
 		});
@@ -272,7 +273,7 @@ spa.shells = {};
 spa.Shell = ( function(){
 	var shell = Object.create(spa.RenderBase);
 
-	shell.defualtContainerSelector = '#spa-shell'; // move me
+	shell.defaultContainerSelector = '#spa-shell'; // move me
 
 	shell.add = function(shell){
 		if(!shell.name) return false;
@@ -287,7 +288,7 @@ spa.Shell = ( function(){
 	};
 
 	shell.update = function(shell){
-		shell = shell || spa.shells[ spa.defualts.shell ];
+		shell = shell || spa.shells[ spa.defaults.shell ];
 		if(spa.current.shell === shell) return false;
 
 		spa.current.shell = shell;
@@ -393,8 +394,8 @@ spa.init(function(){
         /* $cache stuff */
         spa.$cache.$loader = jQuery('#spa-loader-holder');
         spa.$cache.$body = jQuery('body');
-        spa.Shell.$container = jQuery(spa.Shell.defualtContainerSelector);
-
+        spa.Shell.$container = jQuery(spa.Shell.defaultContainerSelector);
+                console.log(spa.$cache);
         jQuery(window).on( "popstate", function( event ) {
             spa.EventBase.publish("load-shell", {
                 "path": window.location.pathname,
@@ -449,11 +450,10 @@ spa.init(function(){
     }());
 
 });
-jQuery(window).load(spa.onInit);
 /*
 	when the DOM is finished, start the spa
 */
 jQuery(document).on("DOMContentLoaded", function(event) {
-	spa.EventBase.publish("___dom-content-loaded-start");
-	spa.EventBase.publish("___dom-content-loaded-end");
+	spa.EventBase.publish("__dom-content-loaded-start");
+	spa.EventBase.publish("__dom-content-loaded-end");
 });
