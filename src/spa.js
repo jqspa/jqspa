@@ -105,8 +105,7 @@ spa.includeScript('/src/router.js');
 */
 spa.includeScript('/src/bootstrap.js');
 
-
-spa.onInit();
+jQuery(window).load(spa.onInit);
 /*
 	when the DOM is finished, start the spa
 */
