@@ -1,6 +1,6 @@
 "use strict";
 
-var spa = {};
+var spa = spa || {};
 
 ( function($){
 
@@ -12,14 +12,15 @@ var spa = {};
 	/*
 		set up spa object
 	*/
-	spa = {
+	jQusery.extend(spa, {
+		buildTaskCount: 0,
 		$cache: {},
 		routes: [],
 		current: {},
 		defualts: {
 			shell: 'index'
 		}
-	};
+	});
 
 	spa.inits = [];
 	spa.init = function(callback){
@@ -89,12 +90,10 @@ spa.includeScript('/src/errorpages.js');
 */
 spa.includeScript('/src/shell.js');
 
-
 /*
 	Pages
 */
 spa.includeScript('/src/page.js');
-
 
 /*
 	Components
@@ -106,34 +105,17 @@ spa.includeScript('/src/component.js');
 */
 spa.includeScript('/src/router.js');
 
+/*
+	bootstrap
+*/
+spa.includeScript('/src/bootstrap.js');
 
+
+spa.onInit();
 /*
 	when the DOM is finished, start the spa
 */
 jQuery(document).on("DOMContentLoaded", function(event) {
-	spa.EventBase.publish("dom-content-loaded")
-	/* $cache stuff */
-	spa.$cache.$loader = jQuery('#spa-loader-holder');
-	spa.$cache.$body = jQuery('body');
-	spa.Shell.$container = jQuery(spa.Shell.defualtContainerSelector);
-
-	jQuery(window).on( "popstate", function( event ) {
-		spa.Page.resolver(window.location.pathname, false);
-	} );
-
-	spa.$cache.$body.on('click', '.ajax-link', function(event){
-		event.preventDefault();
-		spa.Page.resolver( jQuery(this).attr('href') );
-		return false;
-	});
-	
-	spa.onInit();
-	/* 
-		load the first route 
-	*/
-	spa.Page.resolver(window.location.pathname, false);
-
-	spa.$cache.$loader.hide();
-	spa.Shell.$container.show();
-
+	spa.EventBase.publish("___dom-content-loaded-start");
+	spa.EventBase.publish("___dom-content-loaded-end");
 });

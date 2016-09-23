@@ -59,12 +59,21 @@ spa.EventBase = ( function(){
 
 	EventBase.__topics = {};
 
-	EventBase.subscribe = function(topic, listener) {
+	EventBase.subscribe = function(topics, listener) {
 		// create the topic if not yet created
-		if(!this.__topics[topic]) this.__topics[topic] = [];
+		var topic, previous = [];
+		if(!$.isArray(topics)) topics = [topics];
+		for(var idx = topics.length; idx--;){
+			topic = topics[idx]
+			if(!~previous.indexOf(topic)) continue;
+			if(!Object.hasOwnProperty(this.__topics, topic)) {
+				this.__topics[topic] = [];
+			}
 
-		// add the listener
-		this.__topics[topic].push(listener);
+			// add the listener
+			this.__topics[topic].push(listener);
+			previous.push(topic);
+		}
 	}
 
 	EventBase.publish = function(topic, data) {
@@ -73,7 +82,9 @@ spa.EventBase = ( function(){
 
 		// send the event to all listeners
 		this.__topics[topic].forEach(function(listener) {
-			listener(data || {});
+			this.setTimeout(function(data){
+				listener(data || {});
+			}, 0, data);
 		});
 	}
 
