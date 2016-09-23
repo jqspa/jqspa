@@ -1,5 +1,5 @@
 "use strict";
-/* globals jQuery, $, spa */
+/* globals jQuery, Mustache, XRegExp, $, spa */
 var spa = spa || {};
 
 ( function($){
@@ -12,7 +12,7 @@ var spa = spa || {};
 	/*
 		set up spa object
 	*/
-	jQusery.extend(spa, {
+	jQuery.extend(spa, {
 		buildTaskCount: 0,
 		$cache: {},
 		routes: [],
