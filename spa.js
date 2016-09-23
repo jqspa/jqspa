@@ -395,7 +395,6 @@ spa.init(function(){
         spa.$cache.$loader = jQuery('#spa-loader-holder');
         spa.$cache.$body = jQuery('body');
         spa.Shell.$container = jQuery(spa.Shell.defaultContainerSelector);
-                console.log(spa.$cache);
         jQuery(window).on( "popstate", function( event ) {
             spa.EventBase.publish("load-shell", {
                 "path": window.location.pathname,
