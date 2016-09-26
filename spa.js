@@ -355,8 +355,8 @@ spa.Router = {
 		return match;
 	},
 
-	resolver: function(url, isHistortyEvent){
-		isHistortyEvent = isHistortyEvent === undefined ? true :  false;
+	resolver: function(url, isHistoryEvent){
+		isHistoryEvent = isHistoryEvent === undefined ? true :  isHistoryEvent;
 		var match = this.lookup(url);
 
 		 // if(spa.current.page && match.REQ.re[0] === spa.current.page.REQ.re[0]) return false;
@@ -372,7 +372,7 @@ spa.Router = {
 		spa.Shell.update(match.shell);
 		match.init();
 
-		if(isHistortyEvent){
+		if(isHistoryEvent){
 			spa.Router.historyAdd({url: url}, match.title, url);
 		}
 
