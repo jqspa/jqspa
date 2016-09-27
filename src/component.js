@@ -12,20 +12,3 @@ spa.Component = ( function(){
 
 	return component;
 } )();
-
-spa.Form = ( function(){
-    var form = Object.create(spa.Component);
-
-    form.value_map = {};
-
-    // Does this make sense
-    form.input_cache = {};
-
-    form.renderErrors = function(data){
-        // data is an object where the kwys
-        // are fields. The values are explanations 
-        // as to why the field is invalid.
-    };
-
-    return form;
-} )();
