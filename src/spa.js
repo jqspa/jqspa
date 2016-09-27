@@ -95,6 +95,12 @@ spa.includeScript('/src/shell.js');
 */
 spa.includeScript('/src/component.js');
 
+
+/*
+	Forms
+*/
+spa.includeScript('/src/forms.js');
+
 /*
 	router
 */

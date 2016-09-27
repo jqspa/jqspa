@@ -305,7 +305,7 @@ spa.components = {};
 spa.Component = ( function(){
 	var component = Object.create(spa.RenderBase);
 
-	component.add =function(component){
+	component.add = function(component){
 		if(!component.name) return false;
 
 		component = this.__declare(component);
@@ -314,6 +314,35 @@ spa.Component = ( function(){
 
 
 	return component;
+} )();
+
+/*
+	Forms
+*/
+spa.Form = ( function(){
+    var form = Object.create(spa.Component);
+
+    form.renderErrors = function(data){
+        jQuery.each(data, function(key, value){
+            form.setError(key, value)
+        });
+    };
+
+    form.setError = function(name, message){
+        var $target = this.getErrorTarget(name);
+        if (message.prototype !== Array.prototype){
+            message = [message];
+        }
+        jQuery.each(message, function(idx, value){
+            $target.append("<span>" + value + "</span>");
+        });
+    };
+
+    form.getErrorTarget = function(name) {
+        return this.$container.find('[for="' + name + '"]')
+    };
+
+    return form;
 } )();
 /*
 	router
