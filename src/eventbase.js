@@ -89,8 +89,5 @@ spa.EventBase = ( function(){
 		});
 	};
 
-
-
-
 	return EventBase;
 } )();

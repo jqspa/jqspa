@@ -2,8 +2,15 @@ spa.Form = ( function(){
     var form = Object.create(spa.Component);
 
     form.renderErrors = function(data){
+        var that = this;
+
         jQuery.each(data, function(key, value){
-            form.setError(key, value)
+            if (Object.hasOwnProperty.call(that, "set" + key + "Error")){
+                that["set" + key + "Error"](key, value)
+            }
+            else{
+                that.setError(key, value)
+            }
         });
     };
 

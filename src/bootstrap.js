@@ -1,8 +1,11 @@
 spa.init(function(){
+    spa.$cache.$style = jQuery('<style id=spa-components-css \>');
+    
     spa.EventBase.subscribe("__dom-content-loaded-start", function(){
         /* $cache stuff */
         spa.$cache.$loader = jQuery('#spa-loader-holder');
         spa.$cache.$body = jQuery('body');
+        spa.$cache.$style.appendTo('head');
         spa.Shell.$container = jQuery(spa.Shell.defaultContainerSelector);
         jQuery(window).on( "popstate", function( event ) {
             spa.EventBase.publish("load-shell", {
