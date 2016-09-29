@@ -1,11 +1,21 @@
 spa.init(function(){
-    spa.$cache.$style = jQuery('<style id=spa-components-css \>');
+    spa.$cache.$styleSheets = [];
+    
+    // spa.$cache.$style = jQuery('<style id=spa-components-css \>');
     
     spa.EventBase.subscribe("__dom-content-loaded-start", function(){
         /* $cache stuff */
         spa.$cache.$loader = jQuery('#spa-loader-holder');
         spa.$cache.$body = jQuery('body');
-        spa.$cache.$style.appendTo('head');
+        
+        // spa.$cache.$style.appendTo('head');
+
+        var $head = $('head');
+        var $styleSheets = spa.$cache.$styleSheets
+        for (var idx = $styleSheets.length; idx--;){
+            $head.append($styleSheets[idx]);
+        }
+        
         spa.Shell.$container = jQuery(spa.Shell.defaultContainerSelector);
         jQuery(window).on( "popstate", function( event ) {
             spa.EventBase.publish("load-shell", {

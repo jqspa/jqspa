@@ -13,7 +13,11 @@ spa.RenderBase = ( function(){
 	};
 
 	RenderBase.__parse_style = function(){
-		spa.$cache.$style.append(this.cssRules || "");
+		var sheet = jQuery('<style class="' + this.name + '-style">')
+		sheet.append(this.cssRules || "");
+		spa.$cache.$styleSheets.append(sheet);
+
+		// spa.$cache.$style.append(this.cssRules || "");
 	};
 
 	RenderBase.init = function(){
