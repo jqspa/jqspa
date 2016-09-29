@@ -1,14 +1,13 @@
 spa.shells = {};
 spa.Shell = ( function(){
-	var shell = Object.create(spa.RenderBase);
+	var shell = spa.Mixer(spa.EventBase, spa.RenderBase);
 
 	shell.defaultContainerSelector = '#spa-shell'; // move me
 
 	shell.add = function(shell){
 		if(!shell.name) return false;
 
-		shell = this.__declare(shell);
-		shell.__parse_style();
+		shell = this.constructor(shell);
 		spa.shells[shell.name] = shell;
 	};
 

@@ -58,6 +58,20 @@ var spa = spa || {};
 		return string;
 	};
 
+	spa.Mixer = function(){
+		var args = [].slice.apply(arguments);
+		var obj = {};
+
+		obj.constructor = function(config){
+			var instance = {}
+			for(var idx = 0; idx < args.length; idx++){
+				$.extend(instance, args[idx].constructor());
+			}
+			return $.extend(instance, config || {});
+		};
+		return obj;
+	};
+	
 })(jQuery);
 
 /*
