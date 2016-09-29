@@ -6,7 +6,7 @@ spa.Service = ( function(){
 		if(!service.name) return false;
 
 		service = this.__declare(service);
-
+        service.init();
 		spa.services[service.name] = service;
 	};
 

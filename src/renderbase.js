@@ -4,11 +4,20 @@ spa.RenderBase = ( function(){
 	RenderBase.context = {};
 	RenderBase.template = '';
 	RenderBase.errorTemplates = {};
+	RenderBase.cssRules = '';
 
 	RenderBase.__setUp = function($element){
 		this.$container = $element;
 		this.$container.addClass(this.name);
 		this.init();
+	};
+
+	RenderBase.__parse_style = function(){
+		var sheet = jQuery('<style class="' + this.name + '-style">')
+		sheet.append(this.cssRules || "");
+		spa.$cache.$styleSheets.append(sheet);
+
+		// spa.$cache.$style.append(this.cssRules || "");
 	};
 
 	RenderBase.init = function(){

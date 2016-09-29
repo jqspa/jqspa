@@ -8,7 +8,7 @@ spa.Shell = ( function(){
 		if(!shell.name) return false;
 
 		shell = this.__declare(shell);
-
+		shell.__parse_style();
 		spa.shells[shell.name] = shell;
 	};
 

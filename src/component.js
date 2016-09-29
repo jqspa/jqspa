@@ -6,6 +6,7 @@ spa.Component = ( function(){
 		if(!component.name) return false;
 
 		component = this.__declare(component);
+        component.__parse_style();
 		spa.components[component.name] = component;
 	};
 

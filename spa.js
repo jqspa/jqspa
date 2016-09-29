@@ -154,9 +154,6 @@ spa.EventBase = ( function(){
 		});
 	};
 
-
-
-
 	return EventBase;
 } )();
 
@@ -169,11 +166,20 @@ spa.RenderBase = ( function(){
 	RenderBase.context = {};
 	RenderBase.template = '';
 	RenderBase.errorTemplates = {};
+	RenderBase.cssRules = '';
 
 	RenderBase.__setUp = function($element){
 		this.$container = $element;
 		this.$container.addClass(this.name);
 		this.init();
+	};
+
+	RenderBase.__parse_style = function(){
+		var sheet = jQuery('<style class="' + this.name + '-style">')
+		sheet.append(this.cssRules || "");
+		spa.$cache.$styleSheets.append(sheet);
+
+		// spa.$cache.$style.append(this.cssRules || "");
 	};
 
 	RenderBase.init = function(){
@@ -226,7 +232,7 @@ spa.Service = ( function(){
 		if(!service.name) return false;
 
 		service = this.__declare(service);
-
+        service.init();
 		spa.services[service.name] = service;
 	};
 
@@ -279,7 +285,7 @@ spa.Shell = ( function(){
 		if(!shell.name) return false;
 
 		shell = this.__declare(shell);
-
+		shell.__parse_style();
 		spa.shells[shell.name] = shell;
 	};
 
@@ -309,6 +315,7 @@ spa.Component = ( function(){
 		if(!component.name) return false;
 
 		component = this.__declare(component);
+        component.__parse_style();
 		spa.components[component.name] = component;
 	};
 
@@ -323,8 +330,15 @@ spa.Form = ( function(){
     var form = Object.create(spa.Component);
 
     form.renderErrors = function(data){
+        var that = this;
+
         jQuery.each(data, function(key, value){
-            form.setError(key, value)
+            if (Object.hasOwnProperty.call(that, "set" + key + "Error")){
+                that["set" + key + "Error"](key, value)
+            }
+            else{
+                that.setError(key, value)
+            }
         });
     };
 
@@ -419,10 +433,23 @@ spa.Router = {
 	bootstrap
 */
 spa.init(function(){
+    spa.$cache.$styleSheets = [];
+    
+    // spa.$cache.$style = jQuery('<style id=spa-components-css \>');
+    
     spa.EventBase.subscribe("__dom-content-loaded-start", function(){
         /* $cache stuff */
         spa.$cache.$loader = jQuery('#spa-loader-holder');
         spa.$cache.$body = jQuery('body');
+        
+        // spa.$cache.$style.appendTo('head');
+
+        var $head = $('head');
+        var $styleSheets = spa.$cache.$styleSheets
+        for (var idx = $styleSheets.length; idx--;){
+            $head.append($styleSheets[idx]);
+        }
+        
         spa.Shell.$container = jQuery(spa.Shell.defaultContainerSelector);
         jQuery(window).on( "popstate", function( event ) {
             spa.EventBase.publish("load-shell", {
