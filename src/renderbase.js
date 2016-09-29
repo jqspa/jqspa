@@ -1,10 +1,14 @@
 spa.RenderBase = ( function(){
-	var RenderBase = Object.create(spa.EventBase);
+    var RenderBase = {};
+    RenderBase.errorTemplates = {};
 
-	RenderBase.context = {};
-	RenderBase.template = '';
-	RenderBase.errorTemplates = {};
-	RenderBase.cssRules = '';
+    RenderBase.constructor = function(config){
+    	return $.extend({
+    		context: {},
+    		template: '',
+    		cssRules: ''
+    	}, Object.create(RenderBase), config || {});
+    };
 
 	RenderBase.__setUp = function($element){
 		this.$container = $element;
@@ -15,9 +19,7 @@ spa.RenderBase = ( function(){
 	RenderBase.__parse_style = function(){
 		var sheet = jQuery('<style class="' + this.name + '-style">')
 		sheet.append(this.cssRules || "");
-		spa.$cache.$styleSheets.append(sheet);
-
-		// spa.$cache.$style.append(this.cssRules || "");
+		this.sheet = spa.$cache.$styleSheets.push(sheet);
 	};
 
 	RenderBase.init = function(){
@@ -26,6 +28,7 @@ spa.RenderBase = ( function(){
 	};
 
 	RenderBase.renderTemplate = function(context){
+		if (!this.sheet) this.__parse_style();
 		this.$container.html( Mustache.render(
 			this.template,
 			jQuery.extend({}, this.context, context)
@@ -33,28 +36,68 @@ spa.RenderBase = ( function(){
 		this.components = this.$find(this.$container);
 	};
 
-	RenderBase.$find = function($element, dontStart){
-		var components = [];
-		$element.find('[data-component-name]').each(function(index, element){
+    RenderBase.$find = function($element, dontRender){
+        var components = [];
+        $element.find('[data-component-name]').each(function(index, element){
+        	var component;
+            var $element = jQuery(element);
+            var componentName = $element.data('component-name');
+            var bluePrint = spa.components[componentName];
+            
+            //set error component if none is found
+            if(!bluePrint){
+                component = spa.Component.errorTemplates['404'].constructor({
+                	context: {
+                		name: componentName
+                	}
+                });
 
-			var $element = jQuery(element);
-			var componentName = $element.data('component-name');
-			var component = spa.components[componentName];
-			
-			//set error component if none is found
-			if(!component){
-				component = spa.Component.errorTemplates['404'];
-				component.context = {
-					name: componentName
-				};
-			}else{
-				components.push(component);
-			}
+            } else if ($element.parents('[data-component-name="' + componentName + '"]').length){
+                component = spa.Component.errorTemplates['500'].constructor({
+                	context: {
+                		name: componentName
+                	}
+                });
+            } else{
+            	component = bluePrint();
+            }
 
-			component.__setUp($element);
-		});
+	        components.push(component);
 
-		return components;
-	};
+    	    component.__setUp($element);
+        });
+
+        return components;
+    };
+
+    RenderBase.$insert = function($element){
+    	// var $element = jQuery(element);
+    	var component;
+        var componentName = $element.data('component-name');
+        var bluePrint = spa.components[componentName];
+        
+        //set error component if none is found
+        if(!bluePrint){
+            component = spa.Component.errorTemplates['404'].constructor({
+            	context: {
+            		name: componentName
+            	}
+            });
+
+        } else if ($element.parents('[data-component-name="' + componentName + '"]').length){
+            component = spa.Component.errorTemplates['500'].constructor({
+            	context: {
+            		name: componentName
+            	}
+            });
+        } else{
+        	component = bluePrint();
+        }
+
+        this.components.push(component);
+
+	    component.__setUp($element);
+    };
+
 	return RenderBase;
 } )();

@@ -1,11 +1,14 @@
 spa.EventBase = ( function(){
-	var EventBase = {};
-	EventBase.setTimeoutMap = {};
-	EventBase.setIntervalMap = {};
-	EventBase.listeners = {};
-	EventBase.$container = jQuery({});
+    var EventBase = {};
 
-
+    EventBase.listeners = {};
+    EventBase.constructor = function(config){
+    	return $.extend({
+    		setTimeoutMap: {},
+    		setIntervalMap: {},
+    		$container: jQuery({})
+    	}, Object.create(EventBase), config || {});
+	}
 	EventBase.on = function(event, data, callback){
 		return this.$container.on.apply(this.$container, arguments);
 	};
@@ -45,12 +48,6 @@ spa.EventBase = ( function(){
 
 	EventBase.unload =  function(){
 		this.__clearSets();
-	};
-
-	EventBase.__declare =  function(object){
-		var newObject = Object.create(this);
-
-		return jQuery.extend(newObject, object);
 	};
 
 	EventBase.init =  function(){};

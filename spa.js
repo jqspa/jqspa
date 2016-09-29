@@ -58,19 +58,36 @@ var spa = spa || {};
 		return string;
 	};
 
+	spa.Mixer = function(){
+		var args = [].slice.apply(arguments);
+		var obj = {};
+
+		obj.constructor = function(config){
+			var instance = {}
+			for(var idx = 0; idx < args.length; idx++){
+				$.extend(instance, args[idx].constructor());
+			}
+			return $.extend(instance, config || {});
+		};
+		return obj;
+	};
+	
 })(jQuery);
 
 /*
 	base object for events
 */
 spa.EventBase = ( function(){
-	var EventBase = {};
-	EventBase.setTimeoutMap = {};
-	EventBase.setIntervalMap = {};
-	EventBase.listeners = {};
-	EventBase.$container = jQuery({});
+    var EventBase = {};
 
-
+    EventBase.listeners = {};
+    EventBase.constructor = function(config){
+    	return $.extend({
+    		setTimeoutMap: {},
+    		setIntervalMap: {},
+    		$container: jQuery({})
+    	}, Object.create(EventBase), config || {});
+	}
 	EventBase.on = function(event, data, callback){
 		return this.$container.on.apply(this.$container, arguments);
 	};
@@ -110,12 +127,6 @@ spa.EventBase = ( function(){
 
 	EventBase.unload =  function(){
 		this.__clearSets();
-	};
-
-	EventBase.__declare =  function(object){
-		var newObject = Object.create(this);
-
-		return jQuery.extend(newObject, object);
 	};
 
 	EventBase.init =  function(){};
@@ -161,12 +172,16 @@ spa.EventBase = ( function(){
 	base object for renderables
 */
 spa.RenderBase = ( function(){
-	var RenderBase = Object.create(spa.EventBase);
+    var RenderBase = {};
+    RenderBase.errorTemplates = {};
 
-	RenderBase.context = {};
-	RenderBase.template = '';
-	RenderBase.errorTemplates = {};
-	RenderBase.cssRules = '';
+    RenderBase.constructor = function(config){
+    	return $.extend({
+    		context: {},
+    		template: '',
+    		cssRules: ''
+    	}, Object.create(RenderBase), config || {});
+    };
 
 	RenderBase.__setUp = function($element){
 		this.$container = $element;
@@ -177,9 +192,7 @@ spa.RenderBase = ( function(){
 	RenderBase.__parse_style = function(){
 		var sheet = jQuery('<style class="' + this.name + '-style">')
 		sheet.append(this.cssRules || "");
-		spa.$cache.$styleSheets.append(sheet);
-
-		// spa.$cache.$style.append(this.cssRules || "");
+		this.sheet = spa.$cache.$styleSheets.push(sheet);
 	};
 
 	RenderBase.init = function(){
@@ -188,6 +201,7 @@ spa.RenderBase = ( function(){
 	};
 
 	RenderBase.renderTemplate = function(context){
+		if (!this.sheet) this.__parse_style();
 		this.$container.html( Mustache.render(
 			this.template,
 			jQuery.extend({}, this.context, context)
@@ -195,29 +209,69 @@ spa.RenderBase = ( function(){
 		this.components = this.$find(this.$container);
 	};
 
-	RenderBase.$find = function($element, dontStart){
-		var components = [];
-		$element.find('[data-component-name]').each(function(index, element){
+    RenderBase.$find = function($element, dontRender){
+        var components = [];
+        $element.find('[data-component-name]').each(function(index, element){
+        	var component;
+            var $element = jQuery(element);
+            var componentName = $element.data('component-name');
+            var bluePrint = spa.components[componentName];
+            
+            //set error component if none is found
+            if(!bluePrint){
+                component = spa.Component.errorTemplates['404'].constructor({
+                	context: {
+                		name: componentName
+                	}
+                });
 
-			var $element = jQuery(element);
-			var componentName = $element.data('component-name');
-			var component = spa.components[componentName];
-			
-			//set error component if none is found
-			if(!component){
-				component = spa.Component.errorTemplates['404'];
-				component.context = {
-					name: componentName
-				};
-			}else{
-				components.push(component);
-			}
+            } else if ($element.parents('[data-component-name="' + componentName + '"]').length){
+                component = spa.Component.errorTemplates['500'].constructor({
+                	context: {
+                		name: componentName
+                	}
+                });
+            } else{
+            	component = bluePrint();
+            }
 
-			component.__setUp($element);
-		});
+	        components.push(component);
 
-		return components;
-	};
+    	    component.__setUp($element);
+        });
+
+        return components;
+    };
+
+    RenderBase.$insert = function($element){
+    	// var $element = jQuery(element);
+    	var component;
+        var componentName = $element.data('component-name');
+        var bluePrint = spa.components[componentName];
+        
+        //set error component if none is found
+        if(!bluePrint){
+            component = spa.Component.errorTemplates['404'].constructor({
+            	context: {
+            		name: componentName
+            	}
+            });
+
+        } else if ($element.parents('[data-component-name="' + componentName + '"]').length){
+            component = spa.Component.errorTemplates['500'].constructor({
+            	context: {
+            		name: componentName
+            	}
+            });
+        } else{
+        	component = bluePrint();
+        }
+
+        this.components.push(component);
+
+	    component.__setUp($element);
+    };
+
 	return RenderBase;
 } )();
 
@@ -231,7 +285,7 @@ spa.Service = ( function(){
 	service.add = function(service){
 		if(!service.name) return false;
 
-		service = this.__declare(service);
+		service = this.constructor(service);
         service.init();
 		spa.services[service.name] = service;
 	};
@@ -249,7 +303,7 @@ spa.Model = ( function(){
 	model.add = function(model){
 		if(!model.name) return false;
 
-		model = this.__declare(model);
+		model = this.constructor(model);
 
 		spa.models[model.name] = model;
         
@@ -262,12 +316,12 @@ spa.Model = ( function(){
 /* 
 	error templates
 */
-spa.RenderBase.errorTemplates['404'] = spa.RenderBase.__declare({
+spa.RenderBase.errorTemplates['404'] = spa.RenderBase.constructor({
 	template: '<center><h1><i>Page {{name}} Not Found</i></h1>{{message}}<center>',
 	title: '404'
 });
 
-spa.RenderBase.errorTemplates['500'] = spa.RenderBase.__declare({
+spa.RenderBase.errorTemplates['500'] = spa.RenderBase.constructor({
 	title: '500',
 	template: '<center><h1><i>SPA error {{name}}</i></h1>{{message}}<center>'
 });
@@ -277,15 +331,14 @@ spa.RenderBase.errorTemplates['500'] = spa.RenderBase.__declare({
 */
 spa.shells = {};
 spa.Shell = ( function(){
-	var shell = Object.create(spa.RenderBase);
+	var shell = spa.Mixer(spa.EventBase, spa.RenderBase);
 
 	shell.defaultContainerSelector = '#spa-shell'; // move me
 
 	shell.add = function(shell){
 		if(!shell.name) return false;
 
-		shell = this.__declare(shell);
-		shell.__parse_style();
+		shell = this.constructor(shell);
 		spa.shells[shell.name] = shell;
 	};
 
@@ -309,18 +362,16 @@ spa.Shell = ( function(){
 */
 spa.components = {};
 spa.Component = ( function(){
-	var component = Object.create(spa.RenderBase);
+    var component = spa.Mixer(spa.EventBase, spa.RenderBase);
 
-	component.add = function(component){
-		if(!component.name) return false;
+    component.add = function(component){
+        if(!component.name) return false;
+        spa.components[component.name] = function(){
+        	return this.constructor(component);
+        }.bind(this);
+    };
 
-		component = this.__declare(component);
-        component.__parse_style();
-		spa.components[component.name] = component;
-	};
-
-
-	return component;
+    return component;
 } )();
 
 /*

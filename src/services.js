@@ -5,7 +5,7 @@ spa.Service = ( function(){
 	service.add = function(service){
 		if(!service.name) return false;
 
-		service = this.__declare(service);
+		service = this.constructor(service);
         service.init();
 		spa.services[service.name] = service;
 	};

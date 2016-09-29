@@ -5,7 +5,7 @@ spa.Model = ( function(){
 	model.add = function(model){
 		if(!model.name) return false;
 
-		model = this.__declare(model);
+		model = this.constructor(model);
 
 		spa.models[model.name] = model;
         
