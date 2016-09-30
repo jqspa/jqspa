@@ -72,6 +72,53 @@ var spa = spa || {};
 		return obj;
 	};
 	
+	// Probaly should be a singleton
+	spa.StyleSheets = (function(){
+		var styleSheets = Object.create(Array.prototype);
+
+		styleSheets.create = function(){
+			var args = [].slice.apply(arguments);
+
+			var $head = jQuery("head");
+			if ($head.length) {
+				args.unshift($head);
+				args = this.load.apply(this, args);
+			}
+
+			return $.extend(Object.create(this), args);
+		};
+
+		styleSheets.push = function(){
+			var args = [].slice.apply(arguments);
+			
+			var $head = jQuery("head");
+			if ($head.length) {
+				args.unshift($head);
+				args = this.load.apply(this, args);
+			}
+			return Array.prototype.push.apply(this, args);
+		};
+
+		styleSheets.load = function($head){
+			var sheet, args = [].slice.apply(arguments);
+			args.shift();
+			var sheet_count = args.length, idx = 0;
+			for (;idx < sheet_count; idx++){
+				sheet = args[idx];
+				if ($head.children('style[class="' + sheet.attr("class") + '"]').length === 0){
+            		$head.append(args[idx]);
+            	} else {
+            		args.splice(idx, 1);
+            		sheet_count--
+            		idx--
+            	}
+           	}
+           	return args;
+        };
+
+        return styleSheets;
+	})();
+
 })(jQuery);
 
 /*

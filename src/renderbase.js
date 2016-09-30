@@ -19,7 +19,7 @@ spa.RenderBase = ( function(){
 	RenderBase.__parse_style = function(){
 		var sheet = jQuery('<style class="' + this.name + '-style">')
 		sheet.append(this.cssRules || "");
-		this.sheet = spa.$cache.$styleSheets.push(sheet);
+        this.sheet = spa.$cache.$styleSheets.push(sheet);
 	};
 
 	RenderBase.init = function(){
@@ -28,7 +28,7 @@ spa.RenderBase = ( function(){
 	};
 
 	RenderBase.renderTemplate = function(context){
-		if (!this.sheet) this.__parse_style();
+        if (!this.sheet) this.__parse_style();
 		this.$container.html( Mustache.render(
 			this.template,
 			jQuery.extend({}, this.context, context)
