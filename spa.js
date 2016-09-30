@@ -72,6 +72,53 @@ var spa = spa || {};
 		return obj;
 	};
 	
+	// Probaly should be a singleton
+	spa.StyleSheets = (function(){
+		var styleSheets = Object.create(Array.prototype);
+
+		styleSheets.create = function(){
+			var args = [].slice.apply(arguments);
+
+			var $head = jQuery("head");
+			if ($head.length) {
+				args.unshift($head);
+				args = this.load.apply(this, args);
+			}
+
+			return $.extend(Object.create(this), args);
+		};
+
+		styleSheets.push = function(){
+			var args = [].slice.apply(arguments);
+			
+			var $head = jQuery("head");
+			if ($head.length) {
+				args.unshift($head);
+				args = this.load.apply(this, args);
+			}
+			return Array.prototype.push.apply(this, args);
+		};
+
+		styleSheets.load = function($head){
+			var sheet, args = [].slice.apply(arguments);
+			args.shift();
+			var sheet_count = args.length, idx = 0;
+			for (;idx < sheet_count; idx++){
+				sheet = args[idx];
+				if ($head.children('style[class="' + sheet.attr("class") + '"]').length === 0){
+            		$head.append(args[idx]);
+            	} else {
+            		args.splice(idx, 1);
+            		sheet_count--
+            		idx--
+            	}
+           	}
+           	return args;
+        };
+
+        return styleSheets;
+	})();
+
 })(jQuery);
 
 /*
@@ -192,7 +239,7 @@ spa.RenderBase = ( function(){
 	RenderBase.__parse_style = function(){
 		var sheet = jQuery('<style class="' + this.name + '-style">')
 		sheet.append(this.cssRules || "");
-		this.sheet = spa.$cache.$styleSheets.push(sheet);
+        this.sheet = spa.$cache.$styleSheets.push(sheet);
 	};
 
 	RenderBase.init = function(){
@@ -201,7 +248,7 @@ spa.RenderBase = ( function(){
 	};
 
 	RenderBase.renderTemplate = function(context){
-		if (!this.sheet) this.__parse_style();
+        if (!this.sheet) this.__parse_style();
 		this.$container.html( Mustache.render(
 			this.template,
 			jQuery.extend({}, this.context, context)
@@ -484,22 +531,18 @@ spa.Router = {
 	bootstrap
 */
 spa.init(function(){
-    spa.$cache.$styleSheets = [];
-    
-    // spa.$cache.$style = jQuery('<style id=spa-components-css \>');
+    spa.$cache.$styleSheets = spa.StyleSheets.create();
     
     spa.EventBase.subscribe("__dom-content-loaded-start", function(){
         /* $cache stuff */
         spa.$cache.$loader = jQuery('#spa-loader-holder');
         spa.$cache.$body = jQuery('body');
-        
-        // spa.$cache.$style.appendTo('head');
-
-        var $head = $('head');
-        var $styleSheets = spa.$cache.$styleSheets
-        for (var idx = $styleSheets.length; idx--;){
-            $head.append($styleSheets[idx]);
+        var args = [].slice.call(spa.$cache.$styleSheets);
+        if(args.length){
+            args.unshift(jQuery('head'));
+            spa.$cache.$styleSheets.load.apply({}, args);
         }
+
         
         spa.Shell.$container = jQuery(spa.Shell.defaultContainerSelector);
         jQuery(window).on( "popstate", function( event ) {
