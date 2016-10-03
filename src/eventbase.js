@@ -2,7 +2,7 @@ spa.EventBase = ( function(){
     var EventBase = {};
 
     EventBase.listeners = {};
-    EventBase.constructor = function(config){
+    EventBase.create = function(config){
     	return $.extend({
     		setTimeoutMap: {},
     		setIntervalMap: {},
@@ -86,5 +86,5 @@ spa.EventBase = ( function(){
 		});
 	};
 
-	return EventBase;
+	return Object.create(EventBase);
 } )();

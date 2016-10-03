@@ -1,7 +1,14 @@
 spa.Form = ( function(){
-    var form = Object.create(spa.Component);
+    var Form = {};
 
-    form.renderErrors = function(data){
+    Form.add = function(config){
+        if(!config.name) return false;
+        spa.components[config.name] = function(){
+            return this.create(config);
+        }.bind(this);
+    };
+
+    Form.renderErrors = function(data){
         var that = this;
 
         jQuery.each(data, function(key, value){
@@ -14,7 +21,7 @@ spa.Form = ( function(){
         });
     };
 
-    form.setError = function(name, message){
+    Form.setError = function(name, message){
         var $target = this.getErrorTarget(name);
         if (message.prototype !== Array.prototype){
             message = [message];
@@ -24,9 +31,13 @@ spa.Form = ( function(){
         });
     };
 
-    form.getErrorTarget = function(name) {
-        return this.$container.find('[for="' + name + '"]')
+    Form.getErrorTarget = function(name) {
+        return this.$container.find('[for="' + name + '"]');
     };
 
-    return form;
+    Form.create = function(config){
+        return $.extend(Object.create(Form), config || {});
+    };
+
+    return spa.Mixer(spa.EventBase, spa.RenderBase, Form);
 } )();
