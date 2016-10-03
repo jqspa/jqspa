@@ -63,11 +63,11 @@ var spa = spa || {};
 		var obj = {};
 
 		obj.create = function(config){
-			var prototype = {};
+			var defaults = {};
 			for(var idx = 0; idx < args.length; idx++){
-				prototype = $.extend(prototype, args[idx].create());
+				defaults = $.extend(defaults, args[idx].create());
 			}
-			return $.extend(Object.create(prototype), config || {});
+			return $.extend(Object.create(defaults), config || {});
 		};
 
 		var prototype = {};

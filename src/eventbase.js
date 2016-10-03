@@ -3,11 +3,15 @@ spa.EventBase = ( function(){
 
     EventBase.listeners = {};
     EventBase.create = function(config){
-    	return $.extend({
-    		setTimeoutMap: {},
-    		setIntervalMap: {},
-    		$container: jQuery({})
-    	}, Object.create(EventBase), config || {});
+    	return $.extend(
+    		Object.create(EventBase),
+	    	{
+	    		setTimeoutMap: {},
+	    		setIntervalMap: {},
+	    		$container: jQuery({})
+	    	}, 
+	    	config || {}
+	    );
 	}
 	EventBase.on = function(event, data, callback){
 		return this.$container.on.apply(this.$container, arguments);
