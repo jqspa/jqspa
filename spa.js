@@ -439,8 +439,6 @@ spa.Component = ( function(){
     return spa.Mixer(spa.EventBase, spa.RenderBase, Component);
 } )();
 
-console.log("Comp Proto",spa.Component);
-
 /*
 	Forms
 */
