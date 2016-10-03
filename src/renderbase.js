@@ -3,11 +3,15 @@ spa.RenderBase = ( function(){
     RenderBase.errorTemplates = {};
 
     RenderBase.create = function(config){
-    	return $.extend({
-    		context: {},
-    		template: '',
-    		cssRules: ''
-    	}, Object.create(RenderBase), config || {});
+    	return $.extend(
+            Object.create(RenderBase), 
+            {
+                context: {},
+                template: '',
+                cssRules: ''
+            }, 
+            config || {}
+        );
     };
 
 	RenderBase.__setUp = function($element){

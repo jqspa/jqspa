@@ -63,11 +63,11 @@ var spa = spa || {};
 		var obj = {};
 
 		obj.create = function(config){
-			var prototype = {};
+			var defaults = {};
 			for(var idx = 0; idx < args.length; idx++){
-				prototype = $.extend(prototype, args[idx].create());
+				defaults = $.extend(defaults, args[idx].create());
 			}
-			return $.extend(Object.create(prototype), config || {});
+			return $.extend(Object.create(defaults), config || {});
 		};
 
 		var prototype = {};
@@ -135,11 +135,15 @@ spa.EventBase = ( function(){
 
     EventBase.listeners = {};
     EventBase.create = function(config){
-    	return $.extend({
-    		setTimeoutMap: {},
-    		setIntervalMap: {},
-    		$container: jQuery({})
-    	}, Object.create(EventBase), config || {});
+    	return $.extend(
+    		Object.create(EventBase),
+	    	{
+	    		setTimeoutMap: {},
+	    		setIntervalMap: {},
+	    		$container: jQuery({})
+	    	}, 
+	    	config || {}
+	    );
 	}
 	EventBase.on = function(event, data, callback){
 		return this.$container.on.apply(this.$container, arguments);
@@ -229,11 +233,15 @@ spa.RenderBase = ( function(){
     RenderBase.errorTemplates = {};
 
     RenderBase.create = function(config){
-    	return $.extend({
-    		context: {},
-    		template: '',
-    		cssRules: ''
-    	}, Object.create(RenderBase), config || {});
+    	return $.extend(
+            Object.create(RenderBase), 
+            {
+                context: {},
+                template: '',
+                cssRules: ''
+            }, 
+            config || {}
+        );
     };
 
 	RenderBase.__setUp = function($element){
