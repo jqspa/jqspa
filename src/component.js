@@ -1,13 +1,19 @@
 spa.components = {};
 spa.Component = ( function(){
-    var component = spa.Mixer(spa.EventBase, spa.RenderBase);
+    var Component = {};
 
-    component.add = function(component){
+    Component.add = function(component){
         if(!component.name) return false;
         spa.components[component.name] = function(){
-        	return this.constructor(component);
+            return this.create(component);
         }.bind(this);
     };
 
-    return component;
+    Component.create = function(config){
+        return $.extend(Object.create(Component), config || {});
+    };
+
+    return spa.Mixer(spa.EventBase, spa.RenderBase, Component);
 } )();
+
+console.log("Comp Proto",spa.Component);

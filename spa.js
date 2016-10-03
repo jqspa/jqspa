@@ -62,14 +62,20 @@ var spa = spa || {};
 		var args = [].slice.apply(arguments);
 		var obj = {};
 
-		obj.constructor = function(config){
-			var instance = {}
+		obj.create = function(config){
+			var prototype = {};
 			for(var idx = 0; idx < args.length; idx++){
-				$.extend(instance, args[idx].constructor());
+				prototype = $.extend(prototype, args[idx].create());
 			}
-			return $.extend(instance, config || {});
+			return $.extend(Object.create(prototype), config || {});
 		};
-		return obj;
+
+		var prototype = {};
+		for(var idx = 0; idx < args.length; idx++){
+			prototype = $.extend(Object.create(prototype), args[idx]);
+		}
+		// console.log(prototype);
+		return $.extend(Object.create(prototype), obj);
 	};
 	
 	// Probaly should be a singleton
@@ -128,7 +134,7 @@ spa.EventBase = ( function(){
     var EventBase = {};
 
     EventBase.listeners = {};
-    EventBase.constructor = function(config){
+    EventBase.create = function(config){
     	return $.extend({
     		setTimeoutMap: {},
     		setIntervalMap: {},
@@ -212,7 +218,7 @@ spa.EventBase = ( function(){
 		});
 	};
 
-	return EventBase;
+	return Object.create(EventBase);
 } )();
 
 /*
@@ -222,7 +228,7 @@ spa.RenderBase = ( function(){
     var RenderBase = {};
     RenderBase.errorTemplates = {};
 
-    RenderBase.constructor = function(config){
+    RenderBase.create = function(config){
     	return $.extend({
     		context: {},
     		template: '',
@@ -266,14 +272,14 @@ spa.RenderBase = ( function(){
             
             //set error component if none is found
             if(!bluePrint){
-                component = spa.Component.errorTemplates['404'].constructor({
+                component = spa.Component.errorTemplates['404'].create({
                 	context: {
                 		name: componentName
                 	}
                 });
 
             } else if ($element.parents('[data-component-name="' + componentName + '"]').length){
-                component = spa.Component.errorTemplates['500'].constructor({
+                component = spa.Component.errorTemplates['500'].create({
                 	context: {
                 		name: componentName
                 	}
@@ -281,7 +287,7 @@ spa.RenderBase = ( function(){
             } else{
             	component = bluePrint();
             }
-
+            
 	        components.push(component);
 
     	    component.__setUp($element);
@@ -298,14 +304,14 @@ spa.RenderBase = ( function(){
         
         //set error component if none is found
         if(!bluePrint){
-            component = spa.Component.errorTemplates['404'].constructor({
+            component = spa.Component.errorTemplates['404'].create({
             	context: {
             		name: componentName
             	}
             });
 
         } else if ($element.parents('[data-component-name="' + componentName + '"]').length){
-            component = spa.Component.errorTemplates['500'].constructor({
+            component = spa.Component.errorTemplates['500'].create({
             	context: {
             		name: componentName
             	}
@@ -319,7 +325,7 @@ spa.RenderBase = ( function(){
 	    component.__setUp($element);
     };
 
-	return RenderBase;
+	return Object.create(RenderBase);
 } )();
 
 /*
@@ -332,7 +338,7 @@ spa.Service = ( function(){
 	service.add = function(service){
 		if(!service.name) return false;
 
-		service = this.constructor(service);
+		service = this.create(service);
         service.init();
 		spa.services[service.name] = service;
 	};
@@ -350,7 +356,7 @@ spa.Model = ( function(){
 	model.add = function(model){
 		if(!model.name) return false;
 
-		model = this.constructor(model);
+		model = this.create(model);
 
 		spa.models[model.name] = model;
         
@@ -385,7 +391,7 @@ spa.Shell = ( function(){
 	shell.add = function(shell){
 		if(!shell.name) return false;
 
-		shell = this.constructor(shell);
+		shell = this.create(shell);
 		spa.shells[shell.name] = shell;
 	};
 
@@ -409,25 +415,38 @@ spa.Shell = ( function(){
 */
 spa.components = {};
 spa.Component = ( function(){
-    var component = spa.Mixer(spa.EventBase, spa.RenderBase);
+    var Component = {};
 
-    component.add = function(component){
+    Component.add = function(component){
         if(!component.name) return false;
         spa.components[component.name] = function(){
-        	return this.constructor(component);
+            return this.create(component);
         }.bind(this);
     };
 
-    return component;
+    Component.create = function(config){
+        return $.extend(Object.create(Component), config || {});
+    };
+
+    return spa.Mixer(spa.EventBase, spa.RenderBase, Component);
 } )();
+
+console.log("Comp Proto",spa.Component);
 
 /*
 	Forms
 */
 spa.Form = ( function(){
-    var form = Object.create(spa.Component);
+    var Form = {};
 
-    form.renderErrors = function(data){
+    Form.add = function(config){
+        if(!config.name) return false;
+        spa.components[config.name] = function(){
+            return this.create(config);
+        }.bind(this);
+    };
+
+    Form.renderErrors = function(data){
         var that = this;
 
         jQuery.each(data, function(key, value){
@@ -440,7 +459,7 @@ spa.Form = ( function(){
         });
     };
 
-    form.setError = function(name, message){
+    Form.setError = function(name, message){
         var $target = this.getErrorTarget(name);
         if (message.prototype !== Array.prototype){
             message = [message];
@@ -450,11 +469,15 @@ spa.Form = ( function(){
         });
     };
 
-    form.getErrorTarget = function(name) {
-        return this.$container.find('[for="' + name + '"]')
+    Form.getErrorTarget = function(name) {
+        return this.$container.find('[for="' + name + '"]');
     };
 
-    return form;
+    Form.create = function(config){
+        return $.extend(Object.create(Form), config || {});
+    };
+
+    return spa.Mixer(spa.EventBase, spa.RenderBase, Form);
 } )();
 /*
 	router

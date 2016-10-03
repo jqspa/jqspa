@@ -2,7 +2,7 @@ spa.RenderBase = ( function(){
     var RenderBase = {};
     RenderBase.errorTemplates = {};
 
-    RenderBase.constructor = function(config){
+    RenderBase.create = function(config){
     	return $.extend({
     		context: {},
     		template: '',
@@ -46,14 +46,14 @@ spa.RenderBase = ( function(){
             
             //set error component if none is found
             if(!bluePrint){
-                component = spa.Component.errorTemplates['404'].constructor({
+                component = spa.Component.errorTemplates['404'].create({
                 	context: {
                 		name: componentName
                 	}
                 });
 
             } else if ($element.parents('[data-component-name="' + componentName + '"]').length){
-                component = spa.Component.errorTemplates['500'].constructor({
+                component = spa.Component.errorTemplates['500'].create({
                 	context: {
                 		name: componentName
                 	}
@@ -61,7 +61,7 @@ spa.RenderBase = ( function(){
             } else{
             	component = bluePrint();
             }
-
+            
 	        components.push(component);
 
     	    component.__setUp($element);
@@ -78,14 +78,14 @@ spa.RenderBase = ( function(){
         
         //set error component if none is found
         if(!bluePrint){
-            component = spa.Component.errorTemplates['404'].constructor({
+            component = spa.Component.errorTemplates['404'].create({
             	context: {
             		name: componentName
             	}
             });
 
         } else if ($element.parents('[data-component-name="' + componentName + '"]').length){
-            component = spa.Component.errorTemplates['500'].constructor({
+            component = spa.Component.errorTemplates['500'].create({
             	context: {
             		name: componentName
             	}
@@ -99,5 +99,5 @@ spa.RenderBase = ( function(){
 	    component.__setUp($element);
     };
 
-	return RenderBase;
+	return Object.create(RenderBase);
 } )();

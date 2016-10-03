@@ -62,14 +62,20 @@ var spa = spa || {};
 		var args = [].slice.apply(arguments);
 		var obj = {};
 
-		obj.constructor = function(config){
-			var instance = {}
+		obj.create = function(config){
+			var prototype = {};
 			for(var idx = 0; idx < args.length; idx++){
-				$.extend(instance, args[idx].constructor());
+				prototype = $.extend(prototype, args[idx].create());
 			}
-			return $.extend(instance, config || {});
+			return $.extend(Object.create(prototype), config || {});
 		};
-		return obj;
+
+		var prototype = {};
+		for(var idx = 0; idx < args.length; idx++){
+			prototype = $.extend(Object.create(prototype), args[idx]);
+		}
+		// console.log(prototype);
+		return $.extend(Object.create(prototype), obj);
 	};
 	
 	// Probaly should be a singleton

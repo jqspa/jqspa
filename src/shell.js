@@ -7,7 +7,7 @@ spa.Shell = ( function(){
 	shell.add = function(shell){
 		if(!shell.name) return false;
 
-		shell = this.constructor(shell);
+		shell = this.create(shell);
 		spa.shells[shell.name] = shell;
 	};
 
