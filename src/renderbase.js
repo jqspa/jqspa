@@ -101,6 +101,7 @@ spa.RenderBase = ( function(){
         this.components.push(component);
 
 	    component.__setUp($element);
+        return component
     };
 
 	return Object.create(RenderBase);
