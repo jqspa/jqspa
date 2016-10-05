@@ -476,7 +476,7 @@ spa.Form = ( function(){
         }
         jQuery.each(message, function(idx, value){
             $target.append('<span class="' + that.errorMessageClass + '">' + value + '</span>');
-        }this);
+        });
     };
 
     Form.getErrorTarget = function(name) {
