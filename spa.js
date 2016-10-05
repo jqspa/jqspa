@@ -216,9 +216,9 @@ spa.EventBase = ( function(){
 
 		// send the event to all listeners
 		this.__topics[topic].forEach(function(listener) {
-			setTimeout(function(data){
-				listener(data || {});
-			}, 0, data);
+			setTimeout(function(data, topic){
+				listener(data || {}, topic);
+			}, 0, data, topic);
 		});
 	};
 
@@ -304,7 +304,7 @@ spa.RenderBase = ( function(){
         return components;
     };
 
-    RenderBase.$insert = function($element){
+    RenderBase.$insert = function($element, config){
     	// var $element = jQuery(element);
     	var component;
         var componentName = $element.data('component-name');
@@ -325,7 +325,7 @@ spa.RenderBase = ( function(){
             	}
             });
         } else{
-        	component = bluePrint();
+        	component = bluePrint(config || {});
         }
 
         this.components.push(component);
@@ -426,10 +426,10 @@ spa.components = {};
 spa.Component = ( function(){
     var Component = {};
 
-    Component.add = function(component){
-        if(!component.name) return false;
-        spa.components[component.name] = function(){
-            return this.create(component);
+    Component.add = function(blue_print_config){
+        if(!blue_print_config.name) return false;
+        spa.components[blue_print_config.name] = function(config){
+            return this.create($.extend(Object.create(blue_print_config), config));
         }.bind(this);
     };
 
@@ -446,10 +446,10 @@ spa.Component = ( function(){
 spa.Form = ( function(){
     var Form = {};
 
-    Form.add = function(config){
-        if(!config.name) return false;
-        spa.components[config.name] = function(){
-            return this.create(config);
+    Form.add = function(blue_print_config){
+        if(!blue_print_config.name) return false;
+        spa.components[blue_print_config.name] = function(config){
+            return this.create($.extend(Object.create(blue_print_config), config));
         }.bind(this);
     };
 

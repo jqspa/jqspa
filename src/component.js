@@ -2,10 +2,10 @@ spa.components = {};
 spa.Component = ( function(){
     var Component = {};
 
-    Component.add = function(component){
-        if(!component.name) return false;
-        spa.components[component.name] = function(){
-            return this.create(component);
+    Component.add = function(blue_print_config){
+        if(!blue_print_config.name) return false;
+        spa.components[blue_print_config.name] = function(config){
+            return this.create($.extend(Object.create(blue_print_config), config));
         }.bind(this);
     };
 
