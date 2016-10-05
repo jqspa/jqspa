@@ -1,10 +1,10 @@
 spa.Form = ( function(){
     var Form = {};
 
-    Form.add = function(config){
-        if(!config.name) return false;
-        spa.components[config.name] = function(){
-            return this.create(config);
+    Form.add = function(blue_print_config){
+        if(!blue_print_config.name) return false;
+        spa.components[blue_print_config.name] = function(config){
+            return this.create($.extend(Object.create(blue_print_config), config));
         }.bind(this);
     };
 

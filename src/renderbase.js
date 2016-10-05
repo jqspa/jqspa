@@ -74,7 +74,7 @@ spa.RenderBase = ( function(){
         return components;
     };
 
-    RenderBase.$insert = function($element){
+    RenderBase.$insert = function($element, config){
     	// var $element = jQuery(element);
     	var component;
         var componentName = $element.data('component-name');
@@ -95,7 +95,7 @@ spa.RenderBase = ( function(){
             	}
             });
         } else{
-        	component = bluePrint();
+        	component = bluePrint(config || {});
         }
 
         this.components.push(component);

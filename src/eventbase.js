@@ -84,9 +84,9 @@ spa.EventBase = ( function(){
 
 		// send the event to all listeners
 		this.__topics[topic].forEach(function(listener) {
-			setTimeout(function(data){
-				listener(data || {});
-			}, 0, data);
+			setTimeout(function(data, topic){
+				listener(data || {}, topic);
+			}, 0, data, topic);
 		});
 	};
 
