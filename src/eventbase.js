@@ -50,7 +50,7 @@ spa.EventBase = ( function(){
 		}
 	};
 
-	EventBase.unload =  function(){
+	EventBase.__cleanUp =  function(){
 		this.__clearSets();
 	};
 

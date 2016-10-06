@@ -1,27 +1,40 @@
 spa.shells = {};
 spa.Shell = ( function(){
-	var shell = spa.Mixer(spa.EventBase, spa.RenderBase);
+	var Shell = {};
+	
+	Shell.defaultContainerSelector = '#spa-shell'; // move me
 
-	shell.defaultContainerSelector = '#spa-shell'; // move me
-
-	shell.add = function(shell){
+	Shell.add = function(shell){
 		if(!shell.name) return false;
 
 		shell = this.create(shell);
 		spa.shells[shell.name] = shell;
 	};
 
-	shell.renderTemplate = function(context, callback){
+	Shell.renderTemplate = function(context, callback){
 		spa.RenderBase.renderTemplate.call(this, context);
 	};
 
-	shell.update = function(shell){
+	Shell.update = function(shell){
 		shell = shell || spa.shells[ spa.defaults.shell ];
 		if(spa.current.shell === shell) return false;
+
+		if (spa.current.shell) spa.current.shell.unload();
 
 		spa.current.shell = shell;
 		shell.__setUp(this.$container);
 	};
 
-	return shell;
+	Shell.unload = function(){
+		this.__cleanUp();
+		(this.components ? this.components:[]).forEach(function(component){
+			Shell.unload.call(component);
+		}.bind(this));
+	};
+
+    Shell.create = function(config){
+        return $.extend(Object.create(Shell), config || {});
+    };
+
+	return spa.Mixer(spa.EventBase, spa.RenderBase, Shell);
 } )();

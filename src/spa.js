@@ -66,15 +66,24 @@ var spa = spa || {};
 			var defaults = {};
 			for(var idx = 0; idx < args.length; idx++){
 				defaults = $.extend(defaults, args[idx].create());
+				// defaults = $.extend(Object.create(defaults), args[idx].create());
 			}
+			defaults = $.extend(Object.create(defaults), obj);
 			return $.extend(Object.create(defaults), config || {});
+		};
+
+		obj.__cleanUp = function(){
+			for(var idx = 0; idx < args.length; idx++){
+				if (args[idx]["__cleanUp"]){
+					args[idx].__cleanUp.call(this);
+				}
+			}
 		};
 
 		var prototype = {};
 		for(var idx = 0; idx < args.length; idx++){
 			prototype = $.extend(Object.create(prototype), args[idx]);
 		}
-		// console.log(prototype);
 		return $.extend(Object.create(prototype), obj);
 	};
 	
@@ -105,6 +114,18 @@ var spa = spa || {};
 			return Array.prototype.push.apply(this, args);
 		};
 
+		styleSheets.unload = function(sheet_class){
+			var components = jQuery("body ." + sheet_class);
+			if (components.length === 0){
+				var $sheet = jQuery('head style.' + sheet_class);
+				$sheet.remove();
+				var idx = this.indexOf($sheet[0]);
+				if (~idx !== 0) this.splice(idx, 1);
+				return true;
+			}
+			return false;
+		};
+
 		styleSheets.load = function($head){
 			var sheet, args = [].slice.apply(arguments);
 			args.shift();
@@ -115,8 +136,8 @@ var spa = spa || {};
             		$head.append(args[idx]);
             	} else {
             		args.splice(idx, 1);
-            		sheet_count--
-            		idx--
+            		sheet_count--;
+            		idx--;
             	}
            	}
            	return args;

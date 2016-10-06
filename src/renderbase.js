@@ -26,6 +26,10 @@ spa.RenderBase = ( function(){
         this.sheet = spa.$cache.$styleSheets.push(sheet);
 	};
 
+    RenderBase.__cleanUp = function(){
+        spa.$cache.$styleSheets.unload(this.$container.attr('class') + '-style');
+    };
+
 	RenderBase.init = function(){
 		// BAD?
 		this.renderTemplate();
