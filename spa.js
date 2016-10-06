@@ -66,15 +66,24 @@ var spa = spa || {};
 			var defaults = {};
 			for(var idx = 0; idx < args.length; idx++){
 				defaults = $.extend(defaults, args[idx].create());
+				// defaults = $.extend(Object.create(defaults), args[idx].create());
 			}
+			defaults = $.extend(Object.create(defaults), obj);
 			return $.extend(Object.create(defaults), config || {});
+		};
+
+		obj.__cleanUp = function(){
+			for(var idx = 0; idx < args.length; idx++){
+				if (args[idx]["__cleanUp"]){
+					args[idx].__cleanUp.call(this);
+				}
+			}
 		};
 
 		var prototype = {};
 		for(var idx = 0; idx < args.length; idx++){
 			prototype = $.extend(Object.create(prototype), args[idx]);
 		}
-		// console.log(prototype);
 		return $.extend(Object.create(prototype), obj);
 	};
 	
@@ -105,6 +114,18 @@ var spa = spa || {};
 			return Array.prototype.push.apply(this, args);
 		};
 
+		styleSheets.unload = function(sheet_class){
+			var components = jQuery("body ." + sheet_class);
+			if (components.length === 0){
+				var $sheet = jQuery('head style.' + sheet_class);
+				$sheet.remove();
+				var idx = this.indexOf($sheet[0]);
+				if (~idx !== 0) this.splice(idx, 1);
+				return true;
+			}
+			return false;
+		};
+
 		styleSheets.load = function($head){
 			var sheet, args = [].slice.apply(arguments);
 			args.shift();
@@ -115,8 +136,8 @@ var spa = spa || {};
             		$head.append(args[idx]);
             	} else {
             		args.splice(idx, 1);
-            		sheet_count--
-            		idx--
+            		sheet_count--;
+            		idx--;
             	}
            	}
            	return args;
@@ -182,7 +203,7 @@ spa.EventBase = ( function(){
 		}
 	};
 
-	EventBase.unload =  function(){
+	EventBase.__cleanUp =  function(){
 		this.__clearSets();
 	};
 
@@ -255,6 +276,10 @@ spa.RenderBase = ( function(){
 		sheet.append(this.cssRules || "");
         this.sheet = spa.$cache.$styleSheets.push(sheet);
 	};
+
+    RenderBase.__cleanUp = function(){
+        spa.$cache.$styleSheets.unload(this.$container.attr('class') + '-style');
+    };
 
 	RenderBase.init = function(){
 		// BAD?
@@ -393,30 +418,43 @@ spa.RenderBase.errorTemplates['500'] = spa.RenderBase.constructor({
 */
 spa.shells = {};
 spa.Shell = ( function(){
-	var shell = spa.Mixer(spa.EventBase, spa.RenderBase);
+	var Shell = {};
+	
+	Shell.defaultContainerSelector = '#spa-shell'; // move me
 
-	shell.defaultContainerSelector = '#spa-shell'; // move me
-
-	shell.add = function(shell){
+	Shell.add = function(shell){
 		if(!shell.name) return false;
 
 		shell = this.create(shell);
 		spa.shells[shell.name] = shell;
 	};
 
-	shell.renderTemplate = function(context, callback){
+	Shell.renderTemplate = function(context, callback){
 		spa.RenderBase.renderTemplate.call(this, context);
 	};
 
-	shell.update = function(shell){
+	Shell.update = function(shell){
 		shell = shell || spa.shells[ spa.defaults.shell ];
 		if(spa.current.shell === shell) return false;
+
+		if (spa.current.shell) spa.current.shell.unload();
 
 		spa.current.shell = shell;
 		shell.__setUp(this.$container);
 	};
 
-	return shell;
+	Shell.unload = function(){
+		this.__cleanUp();
+		(this.components ? this.components:[]).forEach(function(component){
+			Shell.unload.call(component);
+		}.bind(this));
+	};
+
+    Shell.create = function(config){
+        return $.extend(Object.create(Shell), config || {});
+    };
+
+	return spa.Mixer(spa.EventBase, spa.RenderBase, Shell);
 } )();
 
 /*
