@@ -660,12 +660,13 @@ spa.init(function(){
             if (buildTaskCount === 0){
                 spa.EventBase.publish("__spa-ready");
             }
+            buildTaskCount--;
         });
         spa.EventBase.subscribe("spa-build-task-complete", function(data){
-            buildTaskCount--;
             if (buildTaskCount === 0){
                 spa.EventBase.publish("__spa-ready");
             }
+            buildTaskCount--;
         });
     }());
 
