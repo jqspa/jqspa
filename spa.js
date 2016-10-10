@@ -581,8 +581,8 @@ spa.Router = {
 			};
 		}
 		
-		spa.Shell.update(match.shell);
 		match.init();
+		spa.Shell.update(match.shell);
 
 		if(isHistoryEvent){
 			spa.Router.historyAdd({url: url}, match.title, url);
