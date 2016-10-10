@@ -35,12 +35,13 @@ spa.RenderBase = ( function(){
 		this.renderTemplate();
 	};
 
-	RenderBase.renderTemplate = function(context){
+	RenderBase.renderTemplate = function(context, partials){
         if (!this.sheet) this.__parse_style();
 		this.$container.html( Mustache.render(
 			this.template,
-			jQuery.extend({}, this.context, context)
-		) );
+			jQuery.extend({}, this.context, context || {}),
+            jQuery.extend({}, this.templateMap, partials || {}) 
+		));
 		this.components = this.$find(this.$container);
 	};
 
