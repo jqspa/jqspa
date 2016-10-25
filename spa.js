@@ -278,6 +278,7 @@ spa.RenderBase = ( function(){
 	};
 
     RenderBase.__cleanUp = function(){
+        this.$container.removeClass(this.name);
         spa.$cache.$styleSheets.unload(this.$container.attr('class') + '-style');
     };
 
