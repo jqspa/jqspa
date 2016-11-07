@@ -4,12 +4,15 @@ spa.RenderBase = ( function(){
 
     RenderBase.create = function(config){
     	return $.extend(
-            Object.create(RenderBase), 
+            Object.create(this), 
             {
+                setTimeoutMap: {},
+                setIntervalMap: {},
+                $container: jQuery({}),
                 context: {},
                 template: '',
                 cssRules: ''
-            }, 
+            },
             config || {}
         );
     };
@@ -27,9 +30,51 @@ spa.RenderBase = ( function(){
 	};
 
     RenderBase.__cleanUp = function(){
+        this.__clearSets();
         this.$container.removeClass(this.name);
         spa.$cache.$styleSheets.unload(this.$container.attr('class') + '-style');
     };
+
+    // ********************************************
+
+    RenderBase.on = function(event, data, callback){
+        return this.$container.on.apply(this.$container, arguments);
+    };
+
+    RenderBase.trigger = function(event, data, callback){
+        return this.$container.trigger.apply(this.$container, arguments);
+    };
+
+    RenderBase.setTimeout = function(name, callback, delay, args){
+        this.setTimeoutMap[name] = window.setTimeout.apply(
+            window,
+            Array.apply(this, arguments).splice(1)
+        );
+
+        return this.setTimeoutMap[name];
+    };
+
+    RenderBase.setInterval = function(name, callback, delay, args){
+
+        this.setIntervalMap[name] = window.setInterval.apply(
+            window,
+            Array.apply(this, arguments).splice(1)
+        );
+
+        return this.setIntervalMap[name];
+    };
+
+    RenderBase.__clearSets = function(){
+        for(var key in this.setIntervalMap){
+            clearInterval( this.setIntervalMap[key] );
+        }
+
+        for(var key in this.setTimeoutMap){
+            clearTimeout( this.setTimeoutMap[key] );
+        }
+    };
+
+    // ********************************************
 
 	RenderBase.init = function(){
 		// BAD?
@@ -110,5 +155,5 @@ spa.RenderBase = ( function(){
         return component
     };
 
-	return Object.create(RenderBase);
+	return RenderBase;
 } )();
