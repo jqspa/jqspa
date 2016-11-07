@@ -1,6 +1,6 @@
 spa.shells = {};
 spa.Shell = ( function(){
-	var Shell = {};
+	var Shell = Object.create(spa.RenderBase);
 	
 	Shell.defaultContainerSelector = '#spa-shell'; // move me
 
@@ -33,8 +33,8 @@ spa.Shell = ( function(){
 	};
 
     Shell.create = function(config){
-        return $.extend(Object.create(Shell), config || {});
+        return return RenderBase.create.call(this, config);
     };
 
-	return spa.Mixer(spa.EventBase, spa.RenderBase, Shell);
+	return Shell;
 } )();

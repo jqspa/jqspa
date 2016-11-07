@@ -1,65 +1,19 @@
 spa.EventBase = ( function(){
     var EventBase = {};
 
-    EventBase.listeners = {};
+	EventBase.__topics = {};
+
     EventBase.create = function(config){
     	return $.extend(
     		Object.create(EventBase),
-	    	{
-	    		setTimeoutMap: {},
-	    		setIntervalMap: {},
-	    		$container: jQuery({})
-	    	}, 
 	    	config || {}
 	    );
-	}
-	EventBase.on = function(event, data, callback){
-		return this.$container.on.apply(this.$container, arguments);
-	};
-
-	EventBase.trigger = function(event, data, callback){
-		return this.$container.trigger.apply(this.$container, arguments);
-	};
-
-	EventBase.setTimeout = function(name, callback, delay, args){
-		this.setTimeoutMap[name] = window.setTimeout.apply(
-			window,
-			Array.apply(this, arguments).splice(1)
-		);
-
-		return this.setTimeoutMap[name];
-	};
-
-	EventBase.setInterval = function(name, callback, delay, args){
-
-		this.setIntervalMap[name] = window.setInterval.apply(
-			window,
-			Array.apply(this, arguments).splice(1)
-		);
-
-		return this.setIntervalMap[name];
-	};
-
-	EventBase.__clearSets = function(){
-		for(var key in this.setIntervalMap){
-			clearInterval( this.setIntervalMap[key] );
-		}
-
-		for(var key in this.setTimeoutMap){
-			clearTimeout( this.setTimeoutMap[key] );
-		}
-	};
-
-	EventBase.__cleanUp =  function(){
-		this.__clearSets();
 	};
 
 	EventBase.init =  function(){};
 	/*
 		pub/sub
 	*/
-
-	EventBase.__topics = {};
 
 	EventBase.subscribe = function(topics, listener) {
 		// create the topic if not yet created
@@ -89,6 +43,6 @@ spa.EventBase = ( function(){
 			}, 0, data, topic);
 		});
 	};
-
-	return Object.create(EventBase);
+	
+	return EventBase;
 } )();

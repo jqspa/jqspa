@@ -1,12 +1,13 @@
 spa.Form = ( function(){
-    var Form = {};
+    var Form = Object.create(spa.RenderBase);
 
     Form.errorMessageClass = "input-error-message";
 
     Form.add = function(blue_print_config){
         if(!blue_print_config.name) return false;
         spa.components[blue_print_config.name] = function(config){
-            return this.create(jQuery.extend(Object.create(blue_print_config), config));
+            config = !config ? blue_print_config : $.extend(Object.create(blue_print_config), config);
+            return this.create(config);
         }.bind(this);
     };
 
@@ -39,8 +40,8 @@ spa.Form = ( function(){
     };
 
     Form.create = function(config){
-        return $.extend(Object.create(Form), config || {});
+        return RenderBase.create.call(this, config);
     };
 
-    return spa.Mixer(spa.EventBase, spa.RenderBase, Form);
+    return Form;
 } )();

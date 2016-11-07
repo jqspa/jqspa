@@ -154,65 +154,19 @@ var spa = spa || {};
 spa.EventBase = ( function(){
     var EventBase = {};
 
-    EventBase.listeners = {};
+	EventBase.__topics = {};
+
     EventBase.create = function(config){
     	return $.extend(
     		Object.create(EventBase),
-	    	{
-	    		setTimeoutMap: {},
-	    		setIntervalMap: {},
-	    		$container: jQuery({})
-	    	}, 
 	    	config || {}
 	    );
-	}
-	EventBase.on = function(event, data, callback){
-		return this.$container.on.apply(this.$container, arguments);
-	};
-
-	EventBase.trigger = function(event, data, callback){
-		return this.$container.trigger.apply(this.$container, arguments);
-	};
-
-	EventBase.setTimeout = function(name, callback, delay, args){
-		this.setTimeoutMap[name] = window.setTimeout.apply(
-			window,
-			Array.apply(this, arguments).splice(1)
-		);
-
-		return this.setTimeoutMap[name];
-	};
-
-	EventBase.setInterval = function(name, callback, delay, args){
-
-		this.setIntervalMap[name] = window.setInterval.apply(
-			window,
-			Array.apply(this, arguments).splice(1)
-		);
-
-		return this.setIntervalMap[name];
-	};
-
-	EventBase.__clearSets = function(){
-		for(var key in this.setIntervalMap){
-			clearInterval( this.setIntervalMap[key] );
-		}
-
-		for(var key in this.setTimeoutMap){
-			clearTimeout( this.setTimeoutMap[key] );
-		}
-	};
-
-	EventBase.__cleanUp =  function(){
-		this.__clearSets();
 	};
 
 	EventBase.init =  function(){};
 	/*
 		pub/sub
 	*/
-
-	EventBase.__topics = {};
 
 	EventBase.subscribe = function(topics, listener) {
 		// create the topic if not yet created
@@ -242,8 +196,8 @@ spa.EventBase = ( function(){
 			}, 0, data, topic);
 		});
 	};
-
-	return Object.create(EventBase);
+	
+	return EventBase;
 } )();
 
 /*
@@ -255,12 +209,15 @@ spa.RenderBase = ( function(){
 
     RenderBase.create = function(config){
     	return $.extend(
-            Object.create(RenderBase), 
+            Object.create(this), 
             {
+                setTimeoutMap: {},
+                setIntervalMap: {},
+                $container: jQuery({}),
                 context: {},
                 template: '',
                 cssRules: ''
-            }, 
+            },
             config || {}
         );
     };
@@ -278,9 +235,51 @@ spa.RenderBase = ( function(){
 	};
 
     RenderBase.__cleanUp = function(){
+        this.__clearSets();
         this.$container.removeClass(this.name);
         spa.$cache.$styleSheets.unload(this.$container.attr('class') + '-style');
     };
+
+    // ********************************************
+
+    RenderBase.on = function(event, data, callback){
+        return this.$container.on.apply(this.$container, arguments);
+    };
+
+    RenderBase.trigger = function(event, data, callback){
+        return this.$container.trigger.apply(this.$container, arguments);
+    };
+
+    RenderBase.setTimeout = function(name, callback, delay, args){
+        this.setTimeoutMap[name] = window.setTimeout.apply(
+            window,
+            Array.apply(this, arguments).splice(1)
+        );
+
+        return this.setTimeoutMap[name];
+    };
+
+    RenderBase.setInterval = function(name, callback, delay, args){
+
+        this.setIntervalMap[name] = window.setInterval.apply(
+            window,
+            Array.apply(this, arguments).splice(1)
+        );
+
+        return this.setIntervalMap[name];
+    };
+
+    RenderBase.__clearSets = function(){
+        for(var key in this.setIntervalMap){
+            clearInterval( this.setIntervalMap[key] );
+        }
+
+        for(var key in this.setTimeoutMap){
+            clearTimeout( this.setTimeoutMap[key] );
+        }
+    };
+
+    // ********************************************
 
 	RenderBase.init = function(){
 		// BAD?
@@ -361,7 +360,7 @@ spa.RenderBase = ( function(){
         return component
     };
 
-	return Object.create(RenderBase);
+	return RenderBase;
 } )();
 
 /*
@@ -428,7 +427,7 @@ spa.RenderBase.errorTemplates['500'] = spa.RenderBase.create({
 */
 spa.shells = {};
 spa.Shell = ( function(){
-	var Shell = {};
+	var Shell = Object.create(spa.RenderBase);
 	
 	Shell.defaultContainerSelector = '#spa-shell'; // move me
 
@@ -461,10 +460,10 @@ spa.Shell = ( function(){
 	};
 
     Shell.create = function(config){
-        return $.extend(Object.create(Shell), config || {});
+        return return RenderBase.create.call(this, config);
     };
 
-	return spa.Mixer(spa.EventBase, spa.RenderBase, Shell);
+	return Shell;
 } )();
 
 /*
@@ -472,34 +471,36 @@ spa.Shell = ( function(){
 */
 spa.components = {};
 spa.Component = ( function(){
-    var Component = {};
+    var Component = Object.create(spa.RenderBase);
 
     Component.add = function(blue_print_config){
         if(!blue_print_config.name) return false;
         spa.components[blue_print_config.name] = function(config){
-            return this.create($.extend(Object.create(blue_print_config), config));
+            config = !config ? blue_print_config : $.extend(Object.create(blue_print_config), config);
+            return this.create(config);
         }.bind(this);
     };
 
     Component.create = function(config){
-        return $.extend(Object.create(Component), config || {});
+        return RenderBase.create.call(this, config);
     };
 
-    return spa.Mixer(spa.EventBase, spa.RenderBase, Component);
+    return Component;
 } )();
 
 /*
 	Forms
 */
 spa.Form = ( function(){
-    var Form = {};
+    var Form = Object.create(spa.RenderBase);
 
     Form.errorMessageClass = "input-error-message";
 
     Form.add = function(blue_print_config){
         if(!blue_print_config.name) return false;
         spa.components[blue_print_config.name] = function(config){
-            return this.create(jQuery.extend(Object.create(blue_print_config), config));
+            config = !config ? blue_print_config : $.extend(Object.create(blue_print_config), config);
+            return this.create(config);
         }.bind(this);
     };
 
@@ -532,10 +533,10 @@ spa.Form = ( function(){
     };
 
     Form.create = function(config){
-        return $.extend(Object.create(Form), config || {});
+        return RenderBase.create.call(this, config);
     };
 
-    return spa.Mixer(spa.EventBase, spa.RenderBase, Form);
+    return Form;
 } )();
 /*
 	router
