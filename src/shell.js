@@ -33,7 +33,7 @@ spa.Shell = ( function(){
 	};
 
     Shell.create = function(config){
-        return return RenderBase.create.call(this, config);
+        return RenderBase.create.call(this, config);
     };
 
 	return Shell;
