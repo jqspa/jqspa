@@ -460,7 +460,7 @@ spa.Shell = ( function(){
 	};
 
     Shell.create = function(config){
-        return return RenderBase.create.call(this, config);
+        return spa.RenderBase.create.call(this, config);
     };
 
 	return Shell;
@@ -482,7 +482,7 @@ spa.Component = ( function(){
     };
 
     Component.create = function(config){
-        return RenderBase.create.call(this, config);
+        return spa.RenderBase.create.call(this, config);
     };
 
     return Component;
@@ -533,7 +533,7 @@ spa.Form = ( function(){
     };
 
     Form.create = function(config){
-        return RenderBase.create.call(this, config);
+        return spa.RenderBase.create.call(this, config);
     };
 
     return Form;

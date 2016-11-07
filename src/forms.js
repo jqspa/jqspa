@@ -40,7 +40,7 @@ spa.Form = ( function(){
     };
 
     Form.create = function(config){
-        return RenderBase.create.call(this, config);
+        return spa.RenderBase.create.call(this, config);
     };
 
     return Form;

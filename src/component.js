@@ -11,7 +11,7 @@ spa.Component = ( function(){
     };
 
     Component.create = function(config){
-        return RenderBase.create.call(this, config);
+        return spa.RenderBase.create.call(this, config);
     };
 
     return Component;
