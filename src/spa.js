@@ -57,35 +57,6 @@ var spa = spa || {};
 		});
 		return string;
 	};
-
-	spa.Mixer = function(){
-		var args = [].slice.apply(arguments);
-		var obj = {};
-
-		obj.create = function(config){
-			var defaults = {};
-			for(var idx = 0; idx < args.length; idx++){
-				defaults = $.extend(defaults, args[idx].create());
-				// defaults = $.extend(Object.create(defaults), args[idx].create());
-			}
-			defaults = $.extend(Object.create(defaults), obj);
-			return $.extend(Object.create(defaults), config || {});
-		};
-
-		obj.__cleanUp = function(){
-			for(var idx = 0; idx < args.length; idx++){
-				if (args[idx]["__cleanUp"]){
-					args[idx].__cleanUp.call(this);
-				}
-			}
-		};
-
-		var prototype = {};
-		for(var idx = 0; idx < args.length; idx++){
-			prototype = $.extend(Object.create(prototype), args[idx]);
-		}
-		return $.extend(Object.create(prototype), obj);
-	};
 	
 	// Probaly should be a singleton
 	spa.StyleSheets = (function(){
