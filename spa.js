@@ -594,7 +594,7 @@ spa.Router = {
 spa.init(function(){
     spa.$cache.$styleSheets = spa.StyleSheets.create();
     
-    spa.EventBase.subscribe("__dom-content-loaded-start", function(){
+    spa.subscribe("__dom-content-loaded-start", function(){
         /* $cache stuff */
         spa.$cache.$loader = jQuery('#spa-loader-holder');
         spa.$cache.$body = jQuery('body');
@@ -607,7 +607,7 @@ spa.init(function(){
         
         spa.Shell.$container = jQuery(spa.Shell.defaultContainerSelector);
         jQuery(window).on( "popstate", function( event ) {
-            spa.EventBase.publish("load-shell", {
+            spa.publish("load-shell", {
                 "path": window.location.pathname,
                 "isHistory": false
             });
@@ -615,7 +615,7 @@ spa.init(function(){
 
         spa.$cache.$body.on('click', '.ajax-link', function(event){
             event.preventDefault();
-            spa.EventBase.publish("load-shell", {
+            spa.publish("load-shell", {
                 "path": jQuery(this).attr('href'),
                 "isHistory": true
             });
@@ -624,18 +624,18 @@ spa.init(function(){
         
     });
 
-    spa.EventBase.subscribe("__spa-ready", function(){
+    spa.subscribe("__spa-ready", function(){
         /* 
             load the first route 
         */
         jQuery.holdReady(false);
-        spa.EventBase.publish("load-shell", {
+        spa.publish("load-shell", {
             "path": window.location.pathname,
             "isHistory": false
         });
     });
 
-    spa.EventBase.subscribe("load-shell", function(data){
+    spa.subscribe("load-shell", function(data){
 
         spa.Router.resolver(data.path, data.isHistory);
 
@@ -646,15 +646,15 @@ spa.init(function(){
     (function(){
         var buildTaskCount = spa.buildTaskCount;
 
-        spa.EventBase.subscribe("__dom-content-loaded-end", function(data){
+        spa.subscribe("__dom-content-loaded-end", function(data){
             if (buildTaskCount === 0){
-                spa.EventBase.publish("__spa-ready");
+                spa.publish("__spa-ready");
             }
             buildTaskCount--;
         });
-        spa.EventBase.subscribe("spa-build-task-complete", function(data){
+        spa.subscribe("spa-build-task-complete", function(data){
             if (buildTaskCount === 0){
-                spa.EventBase.publish("__spa-ready");
+                spa.publish("__spa-ready");
             }
             buildTaskCount--;
         });
@@ -665,6 +665,6 @@ spa.init(function(){
 	when the DOM is finished, start the spa
 */
 jQuery(document).on("DOMContentLoaded", function(event) {
-	spa.EventBase.publish("__dom-content-loaded-start");
-	spa.EventBase.publish("__dom-content-loaded-end");
+	spa.publish("__dom-content-loaded-start");
+	spa.publish("__dom-content-loaded-end");
 });
