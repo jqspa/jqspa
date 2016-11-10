@@ -5,7 +5,7 @@ import re, requests, subprocess
 def js_gcc(code):
 	try:
 		print('local')
-		res = subprocess.getoutput('java -jar lib/closure-compiler.jar spa.js')
+		res = subprocess.getoutput('java -jar lib/closure-compiler.jar -W QUIET spa.js')
 	except e:
 		print('local failed\ncalling google...')
 		res = requests.post('https://closure-compiler.appspot.com/compile', {
