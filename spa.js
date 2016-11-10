@@ -555,7 +555,7 @@ spa.Router = {
 		url = url.replace(/^\/+/, '');
 		routes = routes || this.defaultRoute;
 
-		if(!routes.some(function(route){
+		routes.some(function(route){
 			var re = XRegExp.exec(url, XRegExp(route.uri, 'ix'));
 			if(re){
 				route.REQ = {
@@ -565,7 +565,7 @@ spa.Router = {
 				match = route;
 				return true;
 			}
-		}));
+		});
 
 		return match;
 	},
