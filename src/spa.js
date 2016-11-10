@@ -174,6 +174,6 @@ spa.includeScript('/src/bootstrap.js');
 	when the DOM is finished, start the spa
 */
 jQuery(document).on("DOMContentLoaded", function(event) {
-	spa.EventBase.publish("__dom-content-loaded-start");
-	spa.EventBase.publish("__dom-content-loaded-end");
+	spa.publish("__dom-content-loaded-start");
+	spa.publish("__dom-content-loaded-end");
 });
