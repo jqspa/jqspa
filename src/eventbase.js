@@ -4,8 +4,12 @@ spa.EventBase = ( function(){
 	EventBase.__topics = {};
 
     EventBase.create = function(config){
+
     	return $.extend(
     		Object.create(EventBase),
+    		{
+    			__topics: {}
+    		},
 	    	config || {}
 	    );
 	};
@@ -44,5 +48,10 @@ spa.EventBase = ( function(){
 		});
 	};
 	
+
+	var gevent = EventBase.create();
+	spa.subscribe = gevent.subscribe;
+	spa.publish = gevent.publish;
+
 	return EventBase;
 } )();
