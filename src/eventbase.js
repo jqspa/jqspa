@@ -50,8 +50,12 @@ spa.EventBase = ( function(){
 	
 
 	var gevent = EventBase.create();
-	spa.subscribe = gevent.subscribe;
-	spa.publish = gevent.publish;
+	spa.subscribe = function(topics, listener){
+		gevent.subscribe(topics, listener);
+	};
+	spa.publish = function(topic, data){
+		gevent.publish(topic, data);
+	}
 
 	return EventBase;
 } )();
