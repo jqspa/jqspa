@@ -1,8 +1,6 @@
 spa.EventBase = ( function(){
     var EventBase = {};
 
-	EventBase.__topics = {};
-
     EventBase.create = function(config){
 
     	return $.extend(
@@ -21,7 +19,11 @@ spa.EventBase = ( function(){
 
 	EventBase.subscribe = function(topics, listener) {
 		// create the topic if not yet created
-		var topic, previous = [];
+		var 
+			topic, 
+			previous = [],
+			subscriptions = [];
+
 		if(!$.isArray(topics)) topics = [topics];
 		for(var idx = topics.length; idx--;){
 			topic = topics[idx];
@@ -31,8 +33,15 @@ spa.EventBase = ( function(){
 			}
 
 			// add the listener
-			this.__topics[topic].push(listener);
+			subscriptions.push(this.__topics[topic].push(listener)-1);
 			previous.push(topic);
+		}
+		return {
+			remove: function(){
+				for(var idx = subscriptions.length; idx--;){ 
+					delete this.__topics[topic][idx];
+				}
+			}.bind(this)
 		}
 	};
 
