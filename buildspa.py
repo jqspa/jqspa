@@ -1,16 +1,21 @@
 #!/usr/bin/env python3
 
-import re, requests
+import re, requests, subprocess
 
 def js_gcc(code):
-	res = requests.post('https://closure-compiler.appspot.com/compile', {
-		'output_format': 'text',
-		'output_info': 'compiled_code',
-		'compilation_level': 'SIMPLE_OPTIMIZATIONS',
-		'js_code' : code,
-	})
+	try:
+		print('local')
+		res = subprocess.getoutput('java -jar lib/closure-compiler.jar spa.js')
+	except e:
+		print('local failed\ncalling google...')
+		res = requests.post('https://closure-compiler.appspot.com/compile', {
+			'output_format': 'text',
+			'output_info': 'compiled_code',
+			'compilation_level': 'SIMPLE_OPTIMIZATIONS',
+			'js_code' : code,
+		}).text
 
-	return res.text
+	return res
 
 def parseLine(line):
  	match = re.match('^(?P<pre>[\s\t]*)spa\.includeScript\([\s\t]*[\'\"]\/?(?P<dir>.+)[\'\"][\s\t]*\)',line, re.X)
