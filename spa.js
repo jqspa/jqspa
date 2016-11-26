@@ -170,13 +170,24 @@ spa.EventBase = ( function(){
 	};
 
 	EventBase.publish = function(topic, data) {
+		data = data || {}; 
+
+		// run middle ware
+		if(!data.disableMiddleware && this.__topics['__MIDDLEWARE__'] && this.__topics['__MIDDLEWARE__'].length){
+
+			// if all functions dont return true, kill the event
+			if(!this.__topics['__MIDDLEWARE__'].every(function(middleware, index){
+				return middleware(data, topic);
+			})) return false;
+		}
+
 		// return if the topic doesn't exist, or there are no listeners
 		if(!this.__topics[topic] || this.__topics[topic].length < 1) return;
 
 		// send the event to all listeners
 		this.__topics[topic].forEach(function(listener) {
 			setTimeout(function(data, topic){
-				listener(data || {}, topic);
+				listener(data, topic);
 			}, 0, data, topic);
 		});
 	};
