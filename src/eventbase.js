@@ -58,13 +58,17 @@ spa.EventBase = ( function(){
 		}
 
 		// return if the topic doesn't exist, or there are no listeners
-		if(!this.__topics[topic] || this.__topics[topic].length < 1) return;
+		var 
+			args = _.split(topic, ":"),
+			__topic = args[0];
+		if(!this.__topics[__topic] || this.__topics[__topic].length < 1) return;
 
 		// send the event to all listeners
-		this.__topics[topic].forEach(function(listener) {
-			setTimeout(function(data, topic){
-				listener(data, topic);
-			}, 0, data, topic);
+		args.unshift(data);
+		this.__topics[__topic].forEach(function(listener) {
+			setTimeout(function(args){
+				listener.apply(null, args);
+			}, 0, args);
 		});
 	};
 	
