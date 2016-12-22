@@ -79,7 +79,10 @@ spa.EventBase = ( function(){
 	};
 	spa.publish = function(topic, data){
 		gevent.publish(topic, data);
-	}
+	};
+
+	spa.sub = spa.subscribe;
+	spa.pub = spa.publish;
 
 	return EventBase;
 } )();
