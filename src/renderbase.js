@@ -1,6 +1,7 @@
 spa.RenderBase = ( function(){
     var RenderBase = {};
     RenderBase.errorTemplates = {};
+    RenderBase.loadingText = "Loading...";
 
     RenderBase.create = function(config){
     	return $.extend(
@@ -19,8 +20,9 @@ spa.RenderBase = ( function(){
 
 	RenderBase.__setUp = function($element){
 		this.$container = $element;
-		this.$container.addClass(this.name);
-		this.init();
+        this.$container.html(this.loadingText);
+        this.$container.addClass(this.name);
+        this.init();
 	};
 
 	RenderBase.__parse_style = function(){
