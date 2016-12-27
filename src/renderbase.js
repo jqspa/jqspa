@@ -1,82 +1,86 @@
 spa.RenderBase = ( function(){
-    var RenderBase = {};
-    RenderBase.errorTemplates = {};
-    RenderBase.loadingText = "Loading...";
+	var RenderBase = {};
+	RenderBase.errorTemplates = {};
+	RenderBase.loadingText = "Loading...";
 
-    RenderBase.create = function(config){
-    	return $.extend(
-            Object.create(this), 
-            {
-                setTimeoutMap: {},
-                setIntervalMap: {},
-                $container: jQuery({}),
-                context: {},
-                template: '',
-                cssRules: ''
-            },
-            config || {}
-        );
-    };
+	RenderBase.create = function(config){
+		return $.extend(
+			Object.create(this), 
+			{
+				setTimeoutMap: {},
+				setIntervalMap: {},
+				$container: jQuery({}),
+				context: {},
+				template: '',
+				cssRules: '',
+			},
+			config || {}
+		);
+	};
+
+	RenderBase.loadingStart = function(){
+		this.$container.before(this.loadingText);
+	};
 
 	RenderBase.__setUp = function($element){
 		this.$container = $element;
-        this.$container.html(this.loadingText);
-        this.$container.addClass(this.name);
-        this.init();
+		this.$container.addClass(this.name);
+		this.loadingStart();
+		this.init();
 	};
 
 	RenderBase.__parse_style = function(){
 		var sheet = jQuery('<style class="' + this.name + '-style">')
 		sheet.append(this.cssRules || "");
-        this.sheet = spa.$cache.$styleSheets.push(sheet);
+		this.sheet = spa.$cache.$styleSheets.push(sheet);
 	};
 
-    RenderBase.__cleanUp = function(){
-        this.__clearSets();
-        this.$container.removeClass(this.name);
-        spa.$cache.$styleSheets.unload(this.$container.attr('class') + '-style');
-    };
+	RenderBase.__cleanUp = function(){
+		this.__clearSets();
+		this.$container.removeClass(this.name);
+		spa.$cache.$styleSheets.unload(this.$container.attr('class') + '-style');
+	};
 
-    // ********************************************
+	// ********************************************
 
-    RenderBase.on = function(event, data, callback){
-        return this.$container.on.apply(this.$container, arguments);
-    };
+	RenderBase.on = function(event, data, callback){
+		return this.$container.on.apply(this.$container, arguments);
+	};
 
-    RenderBase.trigger = function(event, data, callback){
-        return this.$container.trigger.apply(this.$container, arguments);
-    };
+	RenderBase.trigger = function(event, data, callback){
+		return this.$container.trigger.apply(this.$container, arguments);
+	};
 
-    RenderBase.setTimeout = function(name, callback, delay, args){
-        this.setTimeoutMap[name] = window.setTimeout.apply(
-            window,
-            Array.apply(this, arguments).splice(1)
-        );
+	RenderBase.setTimeout = function(name, callback, delay, args){
+		this.setTimeoutMap[name] = window.setTimeout.apply(
+			window,
+			Array.apply(this, arguments).splice(1)
+		);
 
-        return this.setTimeoutMap[name];
-    };
+		return this.setTimeoutMap[name];
+	};
 
-    RenderBase.setInterval = function(name, callback, delay, args){
+	RenderBase.setInterval = function(name, callback, delay, args){
 
-        this.setIntervalMap[name] = window.setInterval.apply(
-            window,
-            Array.apply(this, arguments).splice(1)
-        );
+		this.setIntervalMap[name] = window.setInterval.apply(
+			window,
+			Array.apply(this, arguments).splice(1)
+		);
 
-        return this.setIntervalMap[name];
-    };
+		return this.setIntervalMap[name];
+	};
 
-    RenderBase.__clearSets = function(){
-        for(var key in this.setIntervalMap){
-            clearInterval( this.setIntervalMap[key] );
-        }
+	RenderBase.__clearSets = function(){
+		for(var key in this.setIntervalMap){
+			clearInterval( this.setIntervalMap[key] );
+		}
 
-        for(var key in this.setTimeoutMap){
-            clearTimeout( this.setTimeoutMap[key] );
-        }
-    };
+		for(var key in this.setTimeoutMap){
+			clearTimeout( this.setTimeoutMap[key] );
+		}
+	};
 
-    // ********************************************
+	// ********************************************
 
 	RenderBase.init = function(){
 		// BAD?
@@ -84,78 +88,78 @@ spa.RenderBase = ( function(){
 	};
 
 	RenderBase.renderTemplate = function(context, partials){
-        if (!this.sheet) this.__parse_style();
+		if (!this.sheet) this.__parse_style();
 		this.$container.html( Mustache.render(
 			this.template,
 			jQuery.extend({}, this.context, context || {}),
-            jQuery.extend({}, this.templateMap, partials || {}) 
+			jQuery.extend({}, this.templateMap, partials || {}) 
 		));
 		this.components = this.$find(this.$container);
 	};
 
-    RenderBase.$find = function($element, dontRender){
-        var components = [];
-        $element.find('[data-component-name]').each(function(index, element){
-        	var component;
-            var $element = jQuery(element);
-            var componentName = $element.data('component-name');
-            var bluePrint = spa.components[componentName];
-            
-            //set error component if none is found
-            if(!bluePrint){
-                component = spa.Component.errorTemplates['404'].create({
-                	context: {
-                		name: componentName
-                	}
-                });
+	RenderBase.$find = function($element, dontRender){
+		var components = [];
+		$element.find('[data-component-name]').each(function(index, element){
+			var component;
+			var $element = jQuery(element);
+			var componentName = $element.data('component-name');
+			var bluePrint = spa.components[componentName];
+			
+			//set error component if none is found
+			if(!bluePrint){
+				component = spa.Component.errorTemplates['404'].create({
+					context: {
+						name: componentName
+					}
+				});
 
-            } else if ($element.parents('[data-component-name="' + componentName + '"]').length){
-                component = spa.Component.errorTemplates['500'].create({
-                	context: {
-                		name: componentName
-                	}
-                });
-            } else{
-            	component = bluePrint();
-            }
-            
-	        components.push(component);
+			} else if ($element.parents('[data-component-name="' + componentName + '"]').length){
+				component = spa.Component.errorTemplates['500'].create({
+					context: {
+						name: componentName
+					}
+				});
+			} else{
+				component = bluePrint();
+			}
+			
+			components.push(component);
 
-    	    component.__setUp($element);
-        });
+			component.__setUp($element);
+		});
 
-        return components;
-    };
+		return components;
+	};
 
-    RenderBase.$insert = function($element, config){
-    	// var $element = jQuery(element);
-    	var component;
-        var componentName = $element.data('component-name');
-        var bluePrint = spa.components[componentName];
-        
-        //set error component if none is found
-        if(!bluePrint){
-            component = spa.Component.errorTemplates['404'].create({
-            	context: {
-            		name: componentName
-            	}
-            });
+	RenderBase.$insert = function($element, config){
+		// var $element = jQuery(element);
+		var component;
+		var componentName = $element.data('component-name');
+		var bluePrint = spa.components[componentName];
+		
+		//set error component if none is found
+		if(!bluePrint){
+			component = spa.Component.errorTemplates['404'].create({
+				context: {
+					name: componentName
+				}
+			});
 
-        } else if ($element.parents('[data-component-name="' + componentName + '"]').length){
-            component = spa.Component.errorTemplates['500'].create({
-            	context: {
-            		name: componentName
-            	}
-            });
-        } else{
-        	component = bluePrint(config || {});
-        }
+		} else if ($element.parents('[data-component-name="' + componentName + '"]').length){
+			component = spa.Component.errorTemplates['500'].create({
+				context: {
+					name: componentName
+				}
+			});
+		} else{
+			component = bluePrint(config || {});
+		}
 
-        this.components.push(component);
+		this.components.push(component);
 
-	    component.__setUp($element);
-        return component
-    };
+		component.__setUp($element);
+		return component
+	};
 
 	return RenderBase;
 } )();
