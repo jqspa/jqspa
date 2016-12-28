@@ -39,7 +39,7 @@ spa.EventBase = ( function(){
 		return {
 			remove: function(){
 				for(var idx = subscriptions.length; idx--;){ 
-					delete this.__topics[topic][idx];
+					delete this.__topics[topic][subscriptions[idx]];
 				}
 			}.bind(this)
 		}
