@@ -13,6 +13,7 @@ spa.RenderBase = ( function(){
 				context: {},
 				template: '',
 				cssRules: '',
+				__subs: [],
 			},
 			config || {}
 		);
@@ -36,7 +37,9 @@ spa.RenderBase = ( function(){
 	};
 
 	RenderBase.__cleanUp = function(){
+		// console.log('cleaning up', this.name, 'component', this);
 		this.__clearSets();
+		this.__clearSubs();
 		this.$container.removeClass(this.name);
 		spa.$cache.$styleSheets.unload(this.$container.attr('class') + '-style');
 	};
@@ -68,6 +71,18 @@ spa.RenderBase = ( function(){
 		);
 
 		return this.setIntervalMap[name];
+	};
+
+	RenderBase.subscribe = function(topics, listener){
+		this.__subs.push(spa.subscribe(topics, listener));
+	};
+
+	RenderBase.publish = spa.publish;
+
+	RenderBase.__clearSubs = function(){
+		this.__subs.forEach(function(value){
+			value.remove();
+		});
 	};
 
 	RenderBase.__clearSets = function(){
