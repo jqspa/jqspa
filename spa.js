@@ -199,10 +199,10 @@ spa.EventBase = ( function(){
 
 	var gevent = EventBase.create();
 	spa.subscribe = function(topics, listener){
-		gevent.subscribe(topics, listener);
+		return gevent.subscribe(topics, listener);
 	};
 	spa.publish = function(topic, data){
-		gevent.publish(topic, data);
+		return gevent.publish(topic, data);
 	};
 
 	spa.sub = spa.subscribe;
