@@ -626,6 +626,8 @@ spa.Router = {
 		match.init();
 		spa.Shell.update(match.shell);
 
+		spa.publish('spa-route-change', match);
+
 		if(isHistoryEvent){
 			spa.Router.historyAdd({url: url}, match.title, url);
 		}
