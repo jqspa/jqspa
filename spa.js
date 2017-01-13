@@ -319,14 +319,14 @@ spa.RenderBase = ( function(){
 
 	RenderBase.renderTemplate = function(context, partials){
 		if (!this.sheet) this.__parse_style();
-		this.$container.hide();
+		this.$container.css('opacity', 0);
 		this.$container.html( Mustache.render(
 			this.template,
 			jQuery.extend({}, this.context, context || {}),
 			jQuery.extend({}, this.templateMap, partials || {}) 
 		));
 		this.components = this.$find(this.$container);
-		this.$container.fadeIn('slow');
+		this.$container.fadeTo(1000, 1);
 	};
 
 	RenderBase.$find = function($element, dontRender){
