@@ -49,6 +49,8 @@ spa.Router = {
 			};
 		}
 		
+		if(spa.devMode) url += '#dev';
+		
 		match.init();
 		spa.Shell.update(match.shell);
 
