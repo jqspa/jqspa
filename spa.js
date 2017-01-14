@@ -19,7 +19,7 @@ var spa = spa || {};
 		current: {},
 		defualts: {
 			shell: 'index'
-		}
+		},
 	}, spa);
 
 	spa.inits = [];
@@ -34,6 +34,9 @@ var spa = spa || {};
 	};
 
 	spa.includeScript = function(path){
+		if(JQSPA_BASE_PATH && path.match(/^\/src\//i)){
+			path = JQSPA_BASE_PATH + path;
+		}
 		// $('head').append('<script src="'+path+'">');
 
 		jQuery.ajax({
@@ -544,6 +547,7 @@ spa.Shell = ( function(){
 
 	Shell.update = function(shell){
 		shell = shell || spa.shells[ spa.defaults.shell ];
+		console.log('update shell continue');
 		if(spa.current.shell === shell) return false;
 
 		if (spa.current.shell) spa.current.shell.unload();
@@ -553,6 +557,8 @@ spa.Shell = ( function(){
 	};
 
 	Shell.unload = function(){
+		console.log('unload shell', arguments.callee.caller);
+		this.$container.fadeTo('fast', 0);
 		this.__cleanUp();
 		(this.components ? this.components:[]).forEach(function(component){
 			Shell.unload.call(component);
@@ -691,6 +697,8 @@ spa.Router = {
 				name: url
 			};
 		}
+		
+		if(spa.devMode) url += '#dev';
 		
 		match.init();
 		spa.Shell.update(match.shell);
