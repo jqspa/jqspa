@@ -17,6 +17,8 @@ spa.Shell = ( function(){
 
 	Shell.update = function(shell){
 		shell = shell || spa.shells[ spa.defaults.shell ];
+		
+		// prevent double load of shell
 		if(spa.current.shell === shell) return false;
 
 		if (spa.current.shell) spa.current.shell.unload();
