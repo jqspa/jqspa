@@ -547,7 +547,8 @@ spa.Shell = ( function(){
 
 	Shell.update = function(shell){
 		shell = shell || spa.shells[ spa.defaults.shell ];
-		console.log('update shell continue');
+		
+		// prevent double load of shell
 		if(spa.current.shell === shell) return false;
 
 		if (spa.current.shell) spa.current.shell.unload();
@@ -557,8 +558,6 @@ spa.Shell = ( function(){
 	};
 
 	Shell.unload = function(){
-		console.log('unload shell', arguments.callee.caller);
-		this.$container.fadeTo('fast', 0);
 		this.__cleanUp();
 		(this.components ? this.components:[]).forEach(function(component){
 			Shell.unload.call(component);
