@@ -337,7 +337,7 @@ spa.RenderBase = ( function(){
 	RenderBase.showContainer = spa.utils.emptyFunc;
 
 
-	RenderBase.renderTemplate = function(context, partials, ){
+	RenderBase.renderTemplate = function(context, partials){
 		this.$container.html(this.render(context, partials));
 		this.components = this.$find(this.$container);
 		this.showContainer();
