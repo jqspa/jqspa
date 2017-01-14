@@ -120,6 +120,11 @@ var spa = spa || {};
 })(jQuery);
 
 /*
+	spa utils
+*/
+spa.includeScript('/src/utils.js');
+
+/*
 	base object for events
 */
 spa.includeScript('/src/eventbase.js');
