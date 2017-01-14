@@ -19,7 +19,7 @@ var spa = spa || {};
 		current: {},
 		defualts: {
 			shell: 'index'
-		}
+		},
 	}, spa);
 
 	spa.inits = [];
@@ -34,6 +34,9 @@ var spa = spa || {};
 	};
 
 	spa.includeScript = function(path){
+		if(JQSPA_BASE_PATH && path.match(/^\/src\//i)){
+			path = JQSPA_BASE_PATH + path;
+		}
 		// $('head').append('<script src="'+path+'">');
 
 		jQuery.ajax({
