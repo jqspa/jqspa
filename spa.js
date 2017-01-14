@@ -138,6 +138,26 @@ spa.utils = {};
 
 })(spa.utils);
 
+(function($){
+    $.fn.serializeObject = function() {
+        var 
+            arr = $(this).serializeArray(), 
+            obj = {};
+        
+        for(var i = 0; i < arr.length; i++) {
+            if(obj[arr[i].name] === undefined) {
+                obj[arr[i].name] = arr[i].value;
+            } else {
+                if(!(obj[arr[i].name] instanceof Array)) {
+                    obj[arr[i].name] = [obj[arr[i].name]];
+                }
+                obj[arr[i].name].push(arr[i].value);
+            }
+        }
+        return obj;
+    };
+})(jQuery);
+
 /*
 	base object for events
 */
