@@ -12,7 +12,7 @@ spa.EventBase = ( function(){
 	    );
 	};
 
-	EventBase.init =  function(){};
+	EventBase.init = spa.utils.emptyFunc;
 	/*
 		pub/sub
 	*/
