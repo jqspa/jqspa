@@ -1,7 +1,7 @@
 spa.RenderBase = ( function(){
 	var RenderBase = {};
 	RenderBase.errorTemplates = {};
-	RenderBase.loadingText = "Loading...";
+	RenderBase.loadingHTML = "Loading...";
 
 	RenderBase.create = function(config){
 		return $.extend(
@@ -19,13 +19,33 @@ spa.RenderBase = ( function(){
 		);
 	};
 
+	// wrapper for mustache render template
+	RenderBase.render = function(template, context, partials){
+		if($.isPlainObject(template)){
+			partials = context;
+			context = template;
+			template = undefined;
+		}
+
+		return Mustache.render(
+			template || this.template,
+			jQuery.extend({}, this.context, context || {}),
+			jQuery.extend({}, this.templateMap, partials || {}) 
+		);
+	};
+
 	RenderBase.loadingStart = function(){
-		this.$container.before(this.loadingText);
+		this.$container.before(this.loadingHTML);
 	};
 
 	RenderBase.__setUp = function($element){
 		this.$container = $element;
 		this.$container.addClass(this.name);
+		
+		this.hideContainerInit();
+
+		if (!this.sheet) this.__parse_style();
+		
 		this.loadingStart();
 		this.init();
 	};
@@ -40,8 +60,27 @@ spa.RenderBase = ( function(){
 		// console.log('cleaning up', this.name, 'component', this);
 		this.__clearSets();
 		this.__clearSubs();
+		this.hideContainer();
 		this.$container.removeClass(this.name);
 		spa.$cache.$styleSheets.unload(this.$container.attr('class') + '-style');
+	};
+
+	RenderBase.init = function(){
+		// BAD?
+		this.renderTemplate();
+	};
+
+	RenderBase.hideContainerInit = spa.utils.emptyFunc;
+
+	RenderBase.hideContainer = spa.utils.emptyFunc;
+
+	RenderBase.showContainer = spa.utils.emptyFunc;
+
+
+	RenderBase.renderTemplate = function(context, partials, ){
+		this.$container.html(this.render(context, partials));
+		this.components = this.$find(this.$container);
+		this.showContainer();
 	};
 
 	// ********************************************
@@ -96,23 +135,6 @@ spa.RenderBase = ( function(){
 	};
 
 	// ********************************************
-
-	RenderBase.init = function(){
-		// BAD?
-		this.renderTemplate();
-	};
-
-	RenderBase.renderTemplate = function(context, partials){
-		if (!this.sheet) this.__parse_style();
-		this.$container.hide();
-		this.$container.html( Mustache.render(
-			this.template,
-			jQuery.extend({}, this.context, context || {}),
-			jQuery.extend({}, this.templateMap, partials || {}) 
-		));
-		this.components = this.$find(this.$container);
-		this.$container.fadeIn('slow');
-	};
 
 	RenderBase.$find = function($element, dontRender){
 		var components = [];
