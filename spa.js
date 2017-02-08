@@ -17,7 +17,7 @@ var spa = spa || {};
 		$cache: {},
 		routes: [],
 		current: {},
-		defualts: {
+		defaults: {
 			shell: 'index'
 		},
 	}, spa);
