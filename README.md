@@ -4,13 +4,12 @@ is global namespace object that will hold everything.
 
 `defaults` *Object* holding project default names and settings.
 `shells` *Object* holding all avail shells
-`pages` *Array* of pages ordered
 `components` *Object* holding
 `$cache` *Object* holding cached jQuery objects
 `errorPages` *object* holding renderable error templates for when things fail
  
 
-* ## `spa.__Renderable`
+* ## `spa.RenderBase`
   This object holds the methods that load, render and manager interaction with the DOM. It is not meant to be used directly but is a base object for other object.
  
   * `context`
@@ -41,11 +40,7 @@ is global namespace object that will hold everything.
   * `renderTemplate( [context] )`
     * `context` *Object* 
       * render context
-    * Renders the template to the objects container. **context** passed will extend `this`.context and be passed to the render.
-
-  * `__delcare( context )`
-    * `context` *object* new instance context
-    * **returns** new instance of `this` object with the passed **context**.
+    * Renders the template to the objects container. **context** passed will extend `this.context` and be passed to the render.
 
   * `__clearSets()`
     * Internal method to clear all `setTimeOuts` and `setIntervals`
