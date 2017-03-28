@@ -690,11 +690,12 @@ spa.Router = {
 		 // if(spa.current.page && match.REQ.re[0] === spa.current.page.REQ.re[0]) return false;
 
 		if(!match){
-			match = spa.RenderBase.errorTemplates['404'];
-
-			match.context = {
-				name: url
-			};
+			match = spa.RenderBase.errorTemplates['404'].create({
+				$container: jQuery(spa.Shell.defaultContainerSelector),
+				context: {
+					name: url
+				}
+			});
 		}
 		
 		if(spa.devMode) url += '#dev';
