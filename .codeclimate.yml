@@ -1,0 +1,52 @@
+---
+engines:
+  csslint:
+    enabled: true
+    checks:
+      overqualified-elements:
+        enabled: false
+  duplication:
+    enabled: true
+    config:
+      languages:
+      - javascript
+  eslint:
+    enabled: true
+    checks:
+      no-extra-semi:
+        enabled: false
+      comma-dangle:
+        enabled: false
+      radix:
+        enabled: false
+      wrap-iife:
+        enabled: false
+      global-require:
+        enabled: false
+      no-void:
+        enabled: false
+      no-process-exit:
+        enabled: false
+  fixme:
+    enabled: true
+  radon:
+    enabled: true
+ratings:
+  paths:
+  - "**.css"
+  - "**.inc"
+  - "**.js"
+  - "**.jsx"
+  - "**.module"
+  - "**.php"
+  - "**.py"
+  - "**.rb"
+exclude_paths:
+  - "lib/*"
+  - "spa.js"
+  - "*.min.js"
+  - "static/spa/js/*"
+  - "env/*"
+  - "*.min.js"
+  - "static/spa/*/index.js"
+  - "api/tests/"
