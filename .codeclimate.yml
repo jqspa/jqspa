@@ -45,8 +45,3 @@ exclude_paths:
   - "lib/*"
   - "spa.js"
   - "*.min.js"
-  - "static/spa/js/*"
-  - "env/*"
-  - "*.min.js"
-  - "static/spa/*/index.js"
-  - "api/tests/"
