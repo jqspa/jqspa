@@ -545,6 +545,12 @@ spa.Shell = ( function(){
 		spa.RenderBase.renderTemplate.call(this, context);
 	};
 
+	Shell.resize = function(){
+        this.$container.height('100vh');
+        this.$container.width('100vw');
+        spa.publish("resize");
+    }
+
 	Shell.update = function(shell){
 		shell = shell || spa.shells[ spa.defaults.shell ];
 		
