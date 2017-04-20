@@ -241,7 +241,6 @@ spa.EventBase = ( function(){
 		data = data || {};
 
 		if(!this.__prePublish(topic, data)){
-			console.warn('killing');
 			return false;
 		}
 
@@ -289,6 +288,7 @@ spa.EventBase = ( function(){
 
 	return EventBase;
 } )();
+
 /*
 	base object for renderables
 */
