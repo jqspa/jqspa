@@ -43,7 +43,7 @@ spa.init(function(){
     });
 
     spa.subscribe("load-shell", function(data){
-
+        
         spa.Router.resolver(data.path, data.isHistory);
 
         spa.$cache.$loader.hide();
