@@ -74,13 +74,18 @@ spa.RenderBase = ( function(){
 
 	RenderBase.hideContainer = spa.utils.emptyFunc;
 
-	RenderBase.showContainer = spa.utils.emptyFunc;
+	RenderBase.showContainer = function(callback){
+		callback();
+	};
 
 
-	RenderBase.renderTemplate = function(context, partials){
+	RenderBase.renderTemplate = function(context, partials, callback){
+		if($.isFunction(context)) callback = context;
+		if($.isFunction(partials)) callback = partials;
+
 		this.$container.html(this.render(context, partials));
 		this.components = this.$find(this.$container);
-		this.showContainer();
+		this.showContainer(callback);
 	};
 
 	// ********************************************
