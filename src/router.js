@@ -17,7 +17,7 @@ spa.Router = {
 
 	lookup: function(url, routes){
 		var match = false;
-		url = url.replace(/^\/+/, '');
+		url = url.replace(/^\/+/, '').replace(/[\?\#].+/i, '');
 		routes = routes || this.defaultRoute;
 
 		routes.some(function(route){
