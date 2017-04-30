@@ -16,18 +16,29 @@ spa.Router = {
 	},
 
 	lookup: function(url, routes){
-		var match = false;
-		url = url.replace(/^\/+/, '').replace(/[\?\#].+/i, '');
 		routes = routes || this.defaultRoute;
+		
+		var re,
+			match = false,
+			parsedURL = XRegExp.exec(url,
+				XRegExp('/?(?<path>[^?]*)\\??(?<query>[^#]*)\\#?(?<hash>.*)',
+					'ix'
+				)
+			);
 
 		routes.some(function(route){
-			var re = XRegExp.exec(url, XRegExp(route.uri, 'ix'));
+			re = XRegExp.exec(parsedURL.path, XRegExp(route.uri, 'ix'));
 			if(re){
 				route.REQ = {
 					url: url,
 					re: re
 				};
+
 				match = route;
+				match.query = spa.Router.deparam(parsedURL.query);
+				match.hash = parsedURL.hash;
+				match.path = "/"+parsedURL.path;
+
 				return true;
 			}
 		});
@@ -39,7 +50,7 @@ spa.Router = {
 		isHistoryEvent = isHistoryEvent === undefined ? true :  isHistoryEvent;
 		var match = this.lookup(url);
 
-		 // if(spa.current.page && match.REQ.re[0] === spa.current.page.REQ.re[0]) return false;
+		// if(match.REQ.re[0] === spa.current.page.REQ.re[0]) return false;
 
 		if(!match){
 			match = spa.RenderBase.errorTemplates['404'].create({
@@ -57,8 +68,10 @@ spa.Router = {
 
 		spa.publish('spa-route-change', match);
 
+		spa.current.route = match
+
 		if(isHistoryEvent){
-			spa.Router.historyAdd({url: url}, match.title, url);
+			spa.Router.historyAdd({url: match.path}, match.title, match.path);
 		}
 
 	},
@@ -66,7 +79,27 @@ spa.Router = {
 	historyAdd: function(state, title, url){
 		window.history.pushState(state, title, url);
 		// window.dispatchEvent(new Event('popstate'));
+	},
 
-	}
+	deparam: function (querystring) {
+		// http://stackoverflow.com/a/14368860
+
+		// remove any preceding url and split
+		querystring = querystring.substring(
+			querystring.indexOf('?')+1
+		).split('&');
+
+		var params = {},
+			pair,
+			decoder = decodeURIComponent;
+
+		// march and parse
+		for (var i = querystring.length - 1; i >= 0; i--) {
+			pair = querystring[i].split('=');
+			params[decoder(pair[0])] = decoder(pair[1] || '');
+		}
+
+		return params;
+	},
 
 };
