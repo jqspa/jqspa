@@ -76,8 +76,7 @@ spa.Router = {
 	},
 
 	historyAdd: function(state, title, url){
-		console.log('check hist',url, window.location.pathname);
-		
+
 		if(url === window.location.pathname){
 			return false;
 		}
