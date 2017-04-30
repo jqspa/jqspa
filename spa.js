@@ -587,9 +587,10 @@ spa.Shell = ( function(){
 		spa.publish("resize");
 	}
 
-	Shell.update = function(shell){
-		shell = shell || spa.shells[ spa.defaults.shell ];
-		
+	Shell.update = function(route){
+		shell = route.shell || spa.shells[ spa.defaults.shell ];
+		shell.route = route;
+
 		// prevent double load of shell
 		if(spa.current.shell === shell) return false;
 
@@ -689,6 +690,7 @@ spa.Form = ( function(){
 	router
 */
 spa.routes = [];
+spa.current.route = {};
 spa.Router = {
 	defaultRoute: spa.routes,
 
@@ -740,8 +742,6 @@ spa.Router = {
 		isHistoryEvent = isHistoryEvent === undefined ? true :  isHistoryEvent;
 		var match = this.lookup(url);
 
-		// if(match.REQ.re[0] === spa.current.page.REQ.re[0]) return false;
-
 		if(!match){
 			match = spa.RenderBase.errorTemplates['404'].create({
 				$container: jQuery(spa.Shell.defaultContainerSelector),
@@ -754,7 +754,7 @@ spa.Router = {
 		if(spa.devMode) url += '#dev';
 		
 		match.init();
-		spa.Shell.update(match.shell);
+		spa.Shell.update(match);
 
 		spa.publish('spa-route-change', match);
 
@@ -767,6 +767,12 @@ spa.Router = {
 	},
 
 	historyAdd: function(state, title, url){
+		console.log('check hist',url, window.location.pathname);
+		
+		if(url === window.location.pathname){
+			return false;
+		}
+
 		window.history.pushState(state, title, url);
 		// window.dispatchEvent(new Event('popstate'));
 	},
