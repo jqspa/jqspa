@@ -21,9 +21,10 @@ spa.Shell = ( function(){
 		spa.publish("resize");
 	}
 
-	Shell.update = function(shell){
-		shell = shell || spa.shells[ spa.defaults.shell ];
-		
+	Shell.update = function(route){
+		shell = route.shell || spa.shells[ spa.defaults.shell ];
+		shell.route = route;
+
 		// prevent double load of shell
 		if(spa.current.shell === shell) return false;
 
