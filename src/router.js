@@ -63,7 +63,7 @@ spa.Router = {
 		if(spa.devMode) url += '#dev';
 		
 		match.init();
-		spa.Shell.update(match);
+		spa.Shell.__update(match);
 
 		spa.publish('spa-route-change', match);
 
