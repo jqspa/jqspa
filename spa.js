@@ -593,7 +593,7 @@ spa.Shell = ( function(){
 
 		// prevent double load of shell
 		if(spa.current.shell === shell){
-			(shell.update || spa.utils.emptyFunc)()
+			(shell.update || spa.utils.emptyFunc).call(shell);
 			return false;
 		}
 		if (spa.current.shell) spa.current.shell.unload();
