@@ -21,13 +21,15 @@ spa.Shell = ( function(){
 		spa.publish("resize");
 	}
 
-	Shell.update = function(route){
+	Shell.__update = function(route){
 		shell = route.shell || spa.shells[ spa.defaults.shell ];
 		shell.route = route;
 
 		// prevent double load of shell
-		if(spa.current.shell === shell) return false;
-
+		if(spa.current.shell === shell){
+			(shell.update || spa.utils.emptyFunc)()
+			return false;
+		}
 		if (spa.current.shell) spa.current.shell.unload();
 
 		spa.current.shell = shell;
