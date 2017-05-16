@@ -27,7 +27,7 @@ spa.Shell = ( function(){
 
 		// prevent double load of shell
 		if(spa.current.shell === shell){
-			(shell.update || spa.utils.emptyFunc).call(shell);
+			(this.update || spa.utils.emptyFunc)();
 			return false;
 		}
 		if (spa.current.shell) spa.current.shell.unload();
