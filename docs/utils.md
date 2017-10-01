@@ -5,9 +5,9 @@ Name space for sharing common utility actions. End users should project specific
 ## Methods
 
 * **emptyFunc**
-	* *type*| `function`
-	* *takes*| nothing/anything
-	* *returns*| `null`
+	* *type* | `function`
+	* *takes* | nothing/anything
+	* *returns* | `null`
 	
 	Empty function so it only needs to be created once.
 	
@@ -22,14 +22,12 @@ Name space for sharing common utility actions. End users should project specific
 	```
 
 * UUID
-
-	*type* `function`
-
-	*takes* nothing
-
-	*returns* UUID as a `string`
+	* *type* | `function`
+	* *takes* | nothing
+	* *returns* | UUID as a `string`
 
 	Creates UUID4*ish* strings.
+
 	```js
 	let uuid = spa.utitls.UUID() // "6ae2b7b9-417b-4393-98e6-a740a7783f90"
 	```
@@ -37,14 +35,12 @@ Name space for sharing common utility actions. End users should project specific
 ## jQuery plugins
 
 * serializeObject
-
-	*type* `function`
-
-	*takes* nothing, works on chained jQuery form node
-
-	*returns* `object`
+	* *type* | `function`
+	* *takes* | nothing, works on chained jQuery form node
+	* *returns* | `object`
 
 	representing the inputed form
+
 	```js
 	$('form').on('submit', function(event){
 		var formData = $(this).serializeObject();
