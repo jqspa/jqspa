@@ -21,7 +21,7 @@ Name space for sharing common utility actions. End users should project specific
 	}
 	```
 
-* UUID
+* **UUID**
 	* *type* | `function`
 	* *takes* | nothing
 	* *returns* | UUID as a `string`
@@ -34,7 +34,7 @@ Name space for sharing common utility actions. End users should project specific
 
 ## jQuery plugins
 
-* serializeObject
+* **serializeObject**
 	* *type* | `function`
 	* *takes* | nothing, works on chained jQuery form node
 	* *returns* | `object`
