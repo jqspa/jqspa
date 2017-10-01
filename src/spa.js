@@ -13,16 +13,16 @@ var spa = spa || {};
 		set up spa object
 	*/
 	spa = jQuery.extend({
-		buildTaskCount: 0,
-		$cache: {},
-		routes: [],
-		current: {},
-		defaults: {
+		buildTaskCount: 0, // check if still used
+		$cache: {}, // holds #jQuery selected objects for commonly used DOM nodes
+		routes: [], // Route objects ordered for route selection
+		current: {}, // current state of objects?
+		defaults: { // Defualt settings for spa components
 			shell: 'index'
 		},
 	}, spa);
 
-	spa.inits = [];
+	spa.inits = []; // ordered list of init callbacks
 	spa.init = function(callback){
 		spa.inits.push(callback);
 	};
@@ -34,6 +34,8 @@ var spa = spa || {};
 	};
 
 	spa.includeScript = function(path){
+		// Dynamic script loading synchronousness
+		// mostly used in dev to help directly debug issues in source files 
 		if(JQSPA_BASE_PATH && path.match(/^\/src\//i)){
 			path = JQSPA_BASE_PATH + path;
 		}
@@ -42,7 +44,7 @@ var spa = spa || {};
 		jQuery.ajax({
 			url: path,
 			dataType: 'script',
-			async: false
+			async: falseac
 		});
 	};
 
@@ -50,6 +52,8 @@ var spa = spa || {};
 		grab templates from the server
 	*/
 	spa.includeTemplate = function(path){
+		// Dynamic template loading synchronousness
+		// mostly used in dev to help directly debug issues in source files 
 		var string = '';
 		jQuery.ajax({
 			url: path,
@@ -61,71 +65,21 @@ var spa = spa || {};
 		return string;
 	};
 	
-	// Probaly should be a singleton
-	spa.StyleSheets = (function(){
-		var styleSheets = Object.create(Array.prototype);
-
-		styleSheets.create = function(){
-			var args = [].slice.apply(arguments);
-
-			var $body = jQuery("body");
-			if ($body.length) {
-				args.unshift($body);
-				args = this.load.apply(this, args);
-			}
-
-			return $.extend(Object.create(this), args);
-		};
-
-		styleSheets.push = function(){
-			var args = [].slice.apply(arguments);
-			
-			var $body = jQuery("body");
-			if ($body.length) {
-				args.unshift($body);
-				args = this.load.apply(this, args);
-			}
-			return Array.prototype.push.apply(this, args);
-		};
-
-		styleSheets.unload = function(sheet_class){
-			var components = jQuery("body ." + sheet_class);
-			if (components.length === 0){
-				var $sheet = jQuery('body style.' + sheet_class);
-				$sheet.remove();
-				var idx = this.indexOf($sheet[0]);
-				if (~idx !== 0) this.splice(idx, 1);
-				return true;
-			}
-			return false;
-		};
-
-		styleSheets.load = function($body){
-			var sheet, args = [].slice.apply(arguments);
-			args.shift();
-			var sheet_count = args.length, idx = 0;
-			for (;idx < sheet_count; idx++){
-				sheet = args[idx];
-				if ($body.children('style[class="' + sheet.attr("class") + '"]').length === 0){
-            		$body.append(args[idx]);
-            	} else {
-            		args.splice(idx, 1);
-            		sheet_count--;
-            		idx--;
-            	}
-           	}
-           	return args;
-        };
-
-        return styleSheets;
-	})();
-
 })(jQuery);
+
+/*
+	include all the 
+*/
 
 /*
 	spa utils
 */
 spa.includeScript('/src/utils.js');
+
+/*
+	base object for style sheets
+*/
+spa.includeScript('/src/stylesheets.js');
 
 /*
 	base object for events
