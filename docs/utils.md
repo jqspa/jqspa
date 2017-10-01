@@ -4,10 +4,10 @@ Name space for sharing common utility actions. End users should project specific
 
 ## Methods
 
-* emptyFunc
-	* *type* `function`
-	* *takes* nothing/anything
-	* *returns* `null`
+* **emptyFunc**
+	* *type*| `function`
+	* *takes*| nothing/anything
+	* *returns*| `null`
 	
 	Empty function so it only needs to be created once.
 	
