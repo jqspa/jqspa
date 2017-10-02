@@ -105,5 +105,4 @@ spa.Router = {
 
 		return params;
 	},
-
 };
