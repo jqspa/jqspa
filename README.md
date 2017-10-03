@@ -1,5 +1,5 @@
 
-#`window.spa`
+# `window.spa`
 is global namespace object that will hold everything.
 
 `defaults` *Object* holding project default names and settings.
