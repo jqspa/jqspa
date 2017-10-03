@@ -288,6 +288,14 @@ Base prototype for DOM renderable objects. This is the base for `spa.Shell` and 
 
 	Searches $element for components and creates them.
 
+* **$insert**
+	* *takes* | 
+		* `jQuery` element with a `data-component-name` attribute.
+		* `object` configurables that will be passed to the created component.
+	* *returns* | `spa.Component` instance for the provided element.
+
+	Blindly assumes the element is within the calling component(This may or may not be problematic depending on how `spa.Component` clean up is done). Attempts to create `spa.Component` instance using the component name from the element's `data-component-name` attribute(If the `data-component-name` does not match any registered comopent an error component is created). Adds the newly created `spa.Component` to the calling component's array of components(Wow terrible naming). Returns the newly created component.
+
 # `spa.Shell`
 
 Shells act as whole page templates and container holders. Shells also act as router able objects by default. Shells extend from and implement everything from
