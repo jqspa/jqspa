@@ -250,7 +250,7 @@ Base prototype for DOM renderable objects. This is the base for `spa.Shell` and 
 	    this.$container.before(loadingHTML);
 	};
 	```
-	
+
 * **hideContainerInit**
 	* *takes* | nothing
 	* *returns* | nothing
@@ -266,3 +266,39 @@ Base prototype for DOM renderable objects. This is the base for `spa.Shell` and 
 * **hideContainer**
 	* *takes* | nothing
 	* *returns* | nothing
+
+	Hides the container when it going be removed from the page.
+
+* **showContainer**
+	* *takes* | `function` callback when the container is fully displayed.
+	* *returns* | nothing
+
+	Call effects on how to display the container. If you implement this, you must call the callback when the container is done.
+
+	```js
+	spa.RenderBase.showContainer = function(callback){
+	    this.$container.prev('.spa-spinner-component').remove();
+	    this.$container.stop().fadeTo('slow', 1, callback);
+	};
+	``` 
+
+* **$find**
+	* *takes* | `jQuery` element to search for components.
+	* *returns* | `array` of components located.
+
+	Searches $element for components and creates them.
+
+# `spa.Shell`
+
+Shells act as whole page templates and container holders. Shells also act as router able objects by default. Shells extend from and implement everything from
+`spa.RenderBase`.
+
+# class Properties
+
+* *defaultContainerSelector* | `string` jQurty selector for the shell container. Default is `"#spa-shell"`.
+
+# Methods
+
+* *add* | 
+	* *takes* | `object` representing the shell to be added. A `name` key must be implemented.
+
