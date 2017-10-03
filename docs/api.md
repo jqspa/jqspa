@@ -164,3 +164,105 @@ User defined services for interacting with data sources, mostly API wrappers.
 	});
 	```
 
+# `spa.Model`
+
+User defined Models for manipulating, caching and distributing data in the application.
+
+## methods
+* **add**
+	* type | `function`
+	* *takes* | `object` holding the Model. 
+		* `name` key with the model name is **required**. 
+		* `init` function can be defined witch will run when service is added.
+	* *returns* `none`
+
+	Method for adding models to your application.
+
+	```js
+	```
+
+
+# `spa.$cache`
+
+`object` that holds cached jQuery nodes.
+
+* **$loader** `#spa-loader-holder` Holds the elements to be displayed while the spa in first loading.
+
+* **$body** `body`
+
+# `spa.current`
+
+`object` that holds current references for spa objects
+
+## Properties
+
+* **shell** | refernce to currently loaded shell.
+* **route** | reference to the current loaded route.
+
+# `spa.RenderBase`
+
+Base prototype for DOM renderable objects. This is the base for `spa.Shell` and `spa.Component`  
+
+## instance Properties
+
+* **$container** | `jQuery` object for the current renderables DOM element node. This will always be set the spa when a randerable is created.
+* **context** | `object` holding the context to be rendered by Mustache.
+* **template** | `string` Base template for renaderable during Mustache rendering.
+* **templateMap** | `object` of other templates as strings to used for the renderable. This object will also be passed to Mustaches render as partials.
+* **cssRules** | `string` style sheet for the renderable.
+
+## class Properties
+
+* **loadingHTML** | `string` HTML content for the DOM while loading. Default `"Loading..."`. This can be edited anytime.
+* **erroTemplates** | `object` Holds what content will be displayed if errors while loading. Currently supports `404` and `500`.
+
+## Methods
+
+* **init**
+	* *takes* | `null`
+	* *returns* | `null`
+	Function be run when ever an instance of the renderable is created. The default action is simply to call the renderables `renderTamplate` method. if you over write this method, remember you have to call `renderTemplate` your self.
+
+* **render**
+	* *takes* |
+		* `string` template to be used with Mustache. **optional** If the first argument isnt a string, the renrderables `.template` will be used.
+		* `object` context to extended on the current renderables context. **required**
+		* *partials* `object` of Mustache partials to be extended on the currents renderables `templateMap`.
+
+* **renderTemplate**
+	* *takes* |
+		* *context* `object` Mustache context object. **optional**
+		* *partials* `object` of Mustache partials to be passed for randering. **optional**
+		* **callback** `function` callback to be ran after renderable contents is on the DOM. **optional**
+
+		This function is responsible for getting content onto the DOM.
+
+* **loadingStart**
+	* *takes* | nothing
+	* *returns* | nothing
+
+	Function to display loading text.
+
+	```js
+	spa.RenderBase.loadingStart = function(){
+	    this.$container.prev('.spa-spinner-component').remove();
+	    var loadingHTML = this.loadingHTML;
+	    this.$container.before(loadingHTML);
+	};
+	```
+	
+* **hideContainerInit**
+	* *takes* | nothing
+	* *returns* | nothing
+
+	Sets initial state of the DOM. Mostly used for set up effects.
+
+	```js
+	spa.RenderBase.hideContainerInit = function(){
+		this.$container.css('opacity', 0);
+	};
+	```
+
+* **hideContainer**
+	* *takes* | nothing
+	* *returns* | nothing

@@ -3,6 +3,33 @@ spa.RenderBase = ( function(){
 	RenderBase.errorTemplates = {};
 	RenderBase.loadingHTML = "Loading...";
 
+	RenderBase.__setUp = function($element){
+		this.$container = $element;
+		this.$container.addClass(this.name);
+		
+		this.hideContainerInit();
+
+		if (!this.sheet) this.__parse_style();
+		
+		this.loadingStart();
+		this.init();
+	};
+
+	RenderBase.__parse_style = function(){
+		var sheet = jQuery('<style class="' + this.name + '-style">')
+		sheet.append(this.cssRules || "");
+		this.sheet = spa.$cache.$styleSheets.push(sheet);
+	};
+
+	RenderBase.__cleanUp = function(){
+		// console.log('cleaning up', this.name, 'component', this);
+		this.__clearSets();
+		this.__clearSubs();
+		this.hideContainer();
+		this.$container.removeClass(this.name);
+		spa.$cache.$styleSheets.unload(this.$container.attr('class') + '-style');
+	};
+
 	RenderBase.create = function(config){
 		return $.extend(
 			Object.create(this), 
@@ -34,42 +61,16 @@ spa.RenderBase = ( function(){
 		);
 	};
 
-	RenderBase.loadingStart = function(){
-		this.$container.before(this.loadingHTML);
-	};
-
-	RenderBase.__setUp = function($element){
-		this.$container = $element;
-		this.$container.addClass(this.name);
-		
-		this.hideContainerInit();
-
-		if (!this.sheet) this.__parse_style();
-		
-		this.loadingStart();
-		this.init();
-	};
-
-	RenderBase.__parse_style = function(){
-		var sheet = jQuery('<style class="' + this.name + '-style">')
-		sheet.append(this.cssRules || "");
-		this.sheet = spa.$cache.$styleSheets.push(sheet);
-	};
-
-	RenderBase.__cleanUp = function(){
-		// console.log('cleaning up', this.name, 'component', this);
-		this.__clearSets();
-		this.__clearSubs();
-		this.hideContainer();
-		this.$container.removeClass(this.name);
-		spa.$cache.$styleSheets.unload(this.$container.attr('class') + '-style');
-	};
-
 	RenderBase.init = function(){
 		// BAD?
 		this.renderTemplate();
 	};
 
+	RenderBase.loadingStart = function(){
+		this.$container.before(this.loadingHTML);
+	};
+
+	// change name to `containerInit`
 	RenderBase.hideContainerInit = spa.utils.emptyFunc;
 
 	RenderBase.hideContainer = spa.utils.emptyFunc;
@@ -141,7 +142,7 @@ spa.RenderBase = ( function(){
 
 	// ********************************************
 
-	RenderBase.$find = function($element, dontRender){
+	RenderBase.$find = function($element){
 		var components = [];
 		$element.find('[data-component-name]').each(function(index, element){
 			var component;

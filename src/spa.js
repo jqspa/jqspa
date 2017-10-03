@@ -68,7 +68,7 @@ var spa = spa || {};
 })(jQuery);
 
 /*
-	include all the 
+	include all the bass
 */
 
 /*
@@ -115,7 +115,6 @@ spa.includeScript('/src/shell.js');
 	Components
 */
 spa.includeScript('/src/component.js');
-
 
 /*
 	Forms
