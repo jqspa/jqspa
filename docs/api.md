@@ -295,6 +295,7 @@ Base prototype for DOM renderable objects. This is the base for `spa.Shell` and 
 	* *returns* | `spa.Component` instance for the provided element.
 
 	Blindly assumes the element is within the calling component(This may or may not be problematic depending on how `spa.Component` clean up is done). Attempts to create `spa.Component` instance using the component name from the element's `data-component-name` attribute(If the `data-component-name` does not match any registered comopent an error component is created). Adds the newly created `spa.Component` to the calling component's array of components(Wow terrible naming). Returns the newly created component.
+	**AVOID USING THIS IF YOU CAN**
 
 # `spa.Shell`
 
